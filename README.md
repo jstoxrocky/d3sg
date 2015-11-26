@@ -21,7 +21,7 @@ https://jsfiddle.net/qo5br6sy/1/
 	ch.set_subtitle('My chart has a subtitle and this is it.')
 	ch.set_ylabel('y-axis label')
 
-**(4) d3sg.js can also update lines in real time!**
+**(4) Update lines in real time!**
 
   	ch.update_line(x1_new_data, y1_new_data, 'series_1')
   	ch.update_line(x1_new_data, y1_new_data, 'series_2')
