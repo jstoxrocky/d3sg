@@ -12,6 +12,7 @@ function chart(chart_location) {
 	this.DATA_DICT = {}
 	this.LINE_DICT = {}
 	this.chart_location = chart_location
+	this.LINE_NUM = 0
 
 
 	this._LOLLIPOP = [  {"color":"#5DA5DA","alpha":1,'linestyle':'-'},
@@ -156,6 +157,9 @@ function chart(chart_location) {
 		this._draw_line(label);
 		this._add_axes();
 		this._add_grid_lines();
+		
+		this._add_legend(label);
+		this.LINE_NUM = this.LINE_NUM + 1;
 
 	}
 
@@ -277,35 +281,29 @@ function chart(chart_location) {
 				.duration(750)
 				.call(yAxis);
 
-
-
-			// $.each(data_dict, function( index, value ) {
-
-			// // Have colors loop
-			// line_num = line_num % 9;
-
-			// var valueline = d3.svg.line()
-			// 	.x( function(d) { return x_scale(d.x); })
-			// 	.y( function(d) { return y_scale(d.y); });
-
-			// line_dict[index] = valueline
-
-			// current_g.append("path")
-			// 	.attr("d", valueline(data_dict[index]))
-			// 	.style("stroke",color_scheme[line_num]["color"])
-			// 	.attr("class","line");
-
-			// line_num = line_num + 1
-
-		// });
-
-
-
-
-
 	}
 
 
+	this._add_legend = function(label) {
+
+		this.svg.append("text")
+			.attr("y", this.LINE_NUM*15 + this.MARGIN.top) // adding goes down
+			.attr("x", 30 + 1.5*this.MARGIN.left) // minus goes down 
+			.attr("dy", "0.3em")
+			.style("text-anchor", "left")
+			.attr("id","ylabel")
+			.text(label);
+
+		this.svg.append("line")
+			.attr("x1", 0 + 1.5*this.MARGIN.left) // minus goes down 
+			.attr("x2", 25 + 1.5*this.MARGIN.left) // minus goes down 
+			.attr("y1", this.LINE_NUM*15 + this.MARGIN.top) // adding goes down
+			.attr("y2", this.LINE_NUM*15 + this.MARGIN.top)
+			.attr("stroke-width", 2)
+            .attr("stroke", this._LOLLIPOP[this.LINE_NUM]["color"]); // adding goes down
+
+
+	}
 
 
 
@@ -314,6 +312,7 @@ function chart(chart_location) {
 	this._add_default_title();
 	this._add_default_subtitle();
 	this._add_default_ylabel();
+	this._add_legend();
 
 
 

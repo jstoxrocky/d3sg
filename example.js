@@ -1,8 +1,8 @@
 $(document).ready(function(){
 
-	title = "Bond Sales Over Time"
-	subtitle = "The price of bond sales has dropped dramatically in the past few days."
-	ylabel = "Bond Price"
+	title = "Three and Six Month T-Bill Prices"
+	subtitle = "The price of the three and six month T-Bills appear to follow a random walk."
+	ylabel = "(USD)"
 	ch_loc = "#ch1";
 
 	x1 = d3.time.day.range(new Date(2013, 2, 1), new Date(2013, 2, 6))
@@ -11,8 +11,8 @@ $(document).ready(function(){
 
 
 	ch = new chart(ch_loc);
-	ch.line(x1, y1, 'series_1');
-	ch.line(x1, y2, 'series_2');
+	ch.line(x1, y1, 'three_month');
+	ch.line(x1, y2, 'six_month');
 	ch.set_title(title);
 	ch.set_subtitle(subtitle);
 	ch.set_ylabel(ylabel);
@@ -33,19 +33,14 @@ $(document).ready(function(){
         	y1.push(new_random_walk_data_point(y1))
         	y2.push(new_random_walk_data_point(y2))
 
-            ch.update_line(x1, y1, 'series_1')
-            ch.update_line(x1, y2, 'series_2')
+            ch.update_line(x1, y1, 'three_month')
+            ch.update_line(x1, y2, 'six_month')
 
             i = i + 1
             setTimeout(moar_data, 1000)
     };
 
-	
-	// $(function() {
-        // $('#moar').click(function(e) {
-   			moar_data()
-   		// })
-   	// });
+   	moar_data()
 
 
 
