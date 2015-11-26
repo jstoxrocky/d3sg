@@ -16,11 +16,9 @@
 	ch.set_subtitle('My chart has a subtitle and this is it.')
 	ch.set_ylabel('y-axis label')
 
-** And thats it!! **
-	
-On top of this, d3sg.js can update charts in real time, unlike tsg:
+**(4) d3sg.js can also update lines in real time!**
 
-  	ch.update_line(x1, y1, 'series_1')
-  	ch.update_line(x1, y2, 'series_2')
+  	ch.update_line(x1_new_data, y1_new_data, 'series_1')
+  	ch.update_line(x1_new_data, y1_new_data, 'series_2')
 	
 
