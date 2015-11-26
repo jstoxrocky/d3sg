@@ -1,10 +1,18 @@
-function chart(chart_location) {
+function chart(chart_location, width, height) {
+
+
+	if (width == undefined) {
+		width = 800
+	}
+	if (height == undefined) {
+		height = 400
+	}
 
 	$(chart_location).empty();
 
 	this.MARGIN = {top: 80, right: 50, bottom: 50, left: 70};
-	this.WIDTH = 800 - this.MARGIN.left - this.MARGIN.right;
-	this.HEIGHT = 400 - this.MARGIN.top - this.MARGIN.bottom;
+	this.WIDTH = width - this.MARGIN.left - this.MARGIN.right;
+	this.HEIGHT = height - this.MARGIN.top - this.MARGIN.bottom;
 	x_scale = d3.time.scale().range([0, this.WIDTH]);
 	y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
 	parseDate = d3.time.format("%d-%b-%y").parse;
@@ -154,9 +162,10 @@ function chart(chart_location) {
 
 		this._create_data_for_d3(x, y, label);
 		this._scale_data(label);
+		this._add_grid_lines();
 		this._draw_line(label);
 		this._add_axes();
-		this._add_grid_lines();
+		
 		
 		this._add_legend(label);
 		this.LINE_NUM = this.LINE_NUM + 1;
