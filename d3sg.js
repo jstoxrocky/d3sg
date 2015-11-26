@@ -257,33 +257,20 @@ function chart(chart_location, width, height) {
 
 	this.update_line = function(x, y, label) {
 
-			this.DATA_DICT = {}
-
-			
-
 			line_dict = this.LINE_DICT
 			valueline = line_dict[label]
-			// console.log(valueline)
-
 			this._create_data_for_d3(x, y, label);
 			this._scale_data(label);
-
 			data = this.DATA_DICT[label]
-
-
 			// Select the section we want to apply our changes to
 			var svg = d3.select(this.chart_location).transition();
 			// Make the changes
-			// t = "#" + label
-			// svg.select('.line') // change the line
 			svg.select('#'+label)
 				.duration(750)
 				.attr("d", valueline(data));
-
 			svg.select(".x.axis") // change the x axis
 				.duration(750)
 				.call(xAxis);
-
 			svg.select(".y.axis") // change the y axis
 				.duration(750)
 				.call(yAxis);
