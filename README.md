@@ -11,7 +11,7 @@ Syntax is very similar to tsg.
 	
 On top of this, d3sg.js can update charts in real time, unlike tsg:
 
-  ch.update_line(x1, y1, 'series_1')
-  ch.update_line(x1, y2, 'series_2')
+  	ch.update_line(x1, y1, 'series_1')
+  	ch.update_line(x1, y2, 'series_2')
 	
 
