@@ -1,5 +1,10 @@
 <h1>d3sg.js</h1>
 
+Simple Example
+https://jsfiddle.net/8wjxwk1e/
+
+Updating Example
+https://jsfiddle.net/qo5br6sy/1/
 
 **(1) Create a new chart object**</br>*(id of chart location required)*
 
