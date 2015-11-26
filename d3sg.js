@@ -165,8 +165,6 @@ function chart(chart_location, width, height) {
 		this._add_grid_lines();
 		this._draw_line(label);
 		this._add_axes();
-		
-		
 		this._add_legend(label);
 		this.LINE_NUM = this.LINE_NUM + 1;
 
