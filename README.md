@@ -9,5 +9,9 @@ Syntax is very similar to tsg.
 	ch.set_subtitle(subtitle); // Adds a chart subtitle
 	ch.set_ylabel(ylabel); // Adds a y-axis label
 	
+On top of this, d3sg.js can update charts in real time, unlike tsg:
+
+  ch.update_line(x1, y1, 'series_1')
+  ch.update_line(x1, y2, 'series_2')
 	
 
