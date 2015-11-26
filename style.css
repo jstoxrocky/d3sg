@@ -1,0 +1,29 @@
+body { 
+	font: 12px Arial;
+	/*color:#3c3c3c;*/
+	color:red;
+}
+
+path {
+	/*stroke: #5DA5DA;*/
+	stroke-width: 2;
+	fill: none;
+}
+
+.axis path,
+
+.axis line {
+	fill: none;
+	stroke: grey;
+	stroke-width: 1;
+	shape-rendering: crispEdges;
+}
+
+
+.grid .tick {
+	stroke: lightgrey;
+	opacity: 0.7;
+}
+.grid path {
+	stroke-width: 0;
+}
