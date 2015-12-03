@@ -44,7 +44,7 @@ function chart(chart_location, width, height) {
 		this.svg.append("rect")
 		    .attr("width", "100%")
 		    .attr("height", "100%")
-		    .attr("fill", "#f0f0f0");
+		    .attr("fill", "#f5f5f5");
 
 		this.g = this.svg.append("g")
 			.attr("transform", "translate(" + this.MARGIN.left + "," + this.MARGIN.top + ")");
