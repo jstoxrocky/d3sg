@@ -13,14 +13,14 @@ function chart(chart_location, width, height) {
 	this.MARGIN = {top: 80, right: 50, bottom: 50, left: 70};
 	this.WIDTH = width - this.MARGIN.left - this.MARGIN.right;
 	this.HEIGHT = height - this.MARGIN.top - this.MARGIN.bottom;
-	x_scale = d3.time.scale().range([0, this.WIDTH]);
-	y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
-	parseDate = d3.time.format("%d-%b-%y").parse;
+
+	parseDate = d3.time.format("%Y-%m-%d").parse;
 	this.DATA = []
 	this.DATA_DICT = {}
 	this.LINE_DICT = {}
 	this.chart_location = chart_location
 	this.LINE_NUM = 0
+	this.LABEL_DICT = {}
 
 
 	this._LOLLIPOP = [  {"color":"#5DA5DA","alpha":1,'linestyle':'-'},
@@ -58,16 +58,28 @@ function chart(chart_location, width, height) {
 			for (var i = 0; i < x.length; i += 1) {
 				var current_dict = {};
 				current_dict['y'] = y[i];
-				// current_dict['y2'] = y2[i];
 				current_dict['x'] = x[i];
 			    this.DATA.push(current_dict);
 			}
 
 		// Make sure X is dates, Y is numeric
+		try {
+		    this.DATA.forEach(function(d) {
+				d.x = parseDate(d.x);
+			});
+			x_scale = d3.time.scale().range([0, this.WIDTH]);
+		}
+		catch(err) {
+			x_scale = d3.scale.linear().range([0, this.WIDTH]);
+		}
+
+		// y
 		this.DATA.forEach(function(d) {
-			// d.x = parseDate(d.x);
 			d.y = +d.y;
 		});
+		y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
+
+
 
 		this.DATA_DICT[label] = this.DATA
 
@@ -109,8 +121,8 @@ function chart(chart_location, width, height) {
 		var data_dict = this.DATA_DICT
 		var line_dict= this.LINE_DICT
 
-
-		// console.log(data_dict)
+		var index = label
+		// console.log(data_dict[index])
 
 		$.each(data_dict, function( index, value ) {
 
@@ -122,6 +134,8 @@ function chart(chart_location, width, height) {
 				.y( function(d) { return y_scale(d.y); });
 
 			line_dict[index] = valueline
+
+			// console.log(valueline)
 
 			current_g.append("path")
 				.attr("d", valueline(data_dict[index]))
@@ -135,6 +149,47 @@ function chart(chart_location, width, height) {
 		
 	}
 	
+
+	this._draw_bar = function(label, bar_width) {
+
+		// this.g.selectAll("rect").remove();
+
+		var current_g = this.g;
+		var svg = this.svg
+		var color_scheme = this._LOLLIPOP;
+		var line_num = 0;
+		var data_dict = this.DATA_DICT
+		var line_dict= this.LINE_DICT
+		var margin = this.MARGIN
+		var height = this.HEIGHT
+
+		var index = label
+		// console.log(data_dict[index])
+
+
+
+		$.each(data_dict, function( index, value ) {
+
+			// Have colors loop
+			line_num = line_num % 9;
+
+			var bar = svg.selectAll("rect.bar")
+			    .data(data_dict[index])
+			  .enter().append("g")
+			    .attr("transform", function(d, i) {return "translate(" + (x_scale(d.x)+margin.left) + ", " + (y_scale(d.y)+margin.top) + ")"; })
+			    .attr("class","bar");
+
+			bar.append("rect")
+			    .attr("height", function(d) { return height - y_scale(d.y); })
+			    .attr("width", bar_width)
+			    .style("stroke-width",0)
+			    .style("fill",color_scheme[line_num]["color"]);
+
+			line_num = line_num + 1
+
+		});
+		
+	}
 
 
 	this._add_axes = function() {
@@ -158,17 +213,44 @@ function chart(chart_location, width, height) {
 
 	this.line = function(x, y, label) {
 
-		// var label = 'series_0';
+		var underscore_label = 'series_' + this.LINE_NUM;
+		if (label == undefined) {label = underscore_label};
+		this.LABEL_DICT[label] = underscore_label;
 
-		this._create_data_for_d3(x, y, label);
-		this._scale_data(label);
+		this._create_data_for_d3(x, y, underscore_label);
+		this._scale_data(underscore_label);
 		this._add_grid_lines();
-		this._draw_line(label);
+		this._draw_line(underscore_label);
 		this._add_axes();
 		this._add_legend(label);
 		this.LINE_NUM = this.LINE_NUM + 1;
 
 	}
+
+
+
+	this.bar = function(x, y, label, bar_width) {
+
+		if (bar_width == undefined){
+			bar_width=2
+		}
+
+		var underscore_label = 'series_' + this.LINE_NUM;
+		if (label == undefined) {label = underscore_label};
+		this.LABEL_DICT[label] = underscore_label;
+
+		this._create_data_for_d3(x, y, underscore_label);
+		this._scale_data(underscore_label);
+		this._add_grid_lines();
+
+		this._draw_bar(underscore_label, bar_width);
+		
+		this._add_axes();
+		this._add_legend(label);
+		this.LINE_NUM = this.LINE_NUM + 1;
+
+	}
+
 
 
 
@@ -213,7 +295,7 @@ function chart(chart_location, width, height) {
 			return d3.svg.axis()
 			.scale(this.x_scale)
 			.orient("bottom")
-			.ticks(5)
+			.ticks(6)
 		}
 		function make_y_axis() {
 			return d3.svg.axis()
@@ -257,21 +339,33 @@ function chart(chart_location, width, height) {
 
 	this.update_line = function(x, y, label) {
 
+			// var underscore_label = 'series_' + this.LINE_NUM;
+			// if (label == undefined) {label = underscore_label};
+
+
+			underscore_label = this.LABEL_DICT[label];
+
 			line_dict = this.LINE_DICT
-			valueline = line_dict[label]
-			this._create_data_for_d3(x, y, label);
-			this._scale_data(label);
-			data = this.DATA_DICT[label]
+			valueline = line_dict[underscore_label]
+
+			// console.log(x)
+			// console.log(y)
+
+			this._create_data_for_d3(x, y, underscore_label);
+			this._scale_data(underscore_label);
+			data = this.DATA_DICT[underscore_label]
 			// Select the section we want to apply our changes to
 			var svg = d3.select(this.chart_location).transition();
 			// Make the changes
-			svg.select('#'+label)
+
+
+			svg.select('#'+underscore_label)
 				.duration(750)
 				.attr("d", valueline(data));
-			svg.select(".x.axis") // change the x axis
+			svg.select(".x.axis")
 				.duration(750)
 				.call(xAxis);
-			svg.select(".y.axis") // change the y axis
+			svg.select(".y.axis")
 				.duration(750)
 				.call(yAxis);
 

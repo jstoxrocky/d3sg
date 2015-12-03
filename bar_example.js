@@ -8,24 +8,20 @@ $(document).ready(function(){
 	}
 
 	// X axis values
-	x = d3.time.day.range(new Date(2013, 2, 1), new Date(2014, 2, 6))
+	x = d3.time.day.range(new Date(2013, 2, 1), new Date(2013, 3, 5))
+
 
 	// Y axis values (random walk)
-	y = [200]
+	y = [200.0]
 	for (var i=0; i < x.length; i++) {
 		x[i] = x[i].toISOString().substring(0, 10);
-		y.push(new_random_walk_data_point(y))
+		y.push(Math.abs(new_random_walk_data_point(y)))
 	}
-	console.log(x)
 
-	y2 = [-200]
-	for (var i=0; i < x.length; i++) {
-		y2.push(new_random_walk_data_point(y2))
-	}
+	y.splice(-1,1)
 
 	ch = new chart("#ch1");
-	ch.line(x, y, 'Three Month');
-	ch.line(x, y2, 'Six Month');
+	ch.bar(x, y, 'Three Month', 25);
 	ch.set_title("Three and Six Month T-Bill Prices");
 	ch.set_subtitle("The price of the three and six month T-Bills appear to follow a random walk.");
 	ch.set_ylabel("(USD)");
