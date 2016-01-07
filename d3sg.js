@@ -120,9 +120,7 @@ function chart(chart_location, width, height) {
 		var line_num = 0;
 		var data_dict = this.DATA_DICT
 		var line_dict= this.LINE_DICT
-
 		var index = label
-		// console.log(data_dict[index])
 
 		$.each(data_dict, function( index, value ) {
 
@@ -134,8 +132,6 @@ function chart(chart_location, width, height) {
 				.y( function(d) { return y_scale(d.y); });
 
 			line_dict[index] = valueline
-
-			// console.log(valueline)
 
 			current_g.append("path")
 				.attr("d", valueline(data_dict[index]))
@@ -162,10 +158,7 @@ function chart(chart_location, width, height) {
 		var line_dict= this.LINE_DICT
 		var margin = this.MARGIN
 		var height = this.HEIGHT
-
 		var index = label
-		// console.log(data_dict[index])
-
 
 
 		$.each(data_dict, function( index, value ) {
@@ -347,9 +340,6 @@ function chart(chart_location, width, height) {
 
 			line_dict = this.LINE_DICT
 			valueline = line_dict[underscore_label]
-
-			// console.log(x)
-			// console.log(y)
 
 			this._create_data_for_d3(x, y, underscore_label);
 			this._scale_data(underscore_label);

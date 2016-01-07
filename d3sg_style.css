@@ -24,3 +24,19 @@ path {
 .grid path {
 	stroke-width: 0;
 }
+
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+
+.tick {
+	font: 12px Arial;
+}
+
+#ylabel {
+	font: 12px Arial;
+}
