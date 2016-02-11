@@ -121,7 +121,9 @@ function chart(chart_location, width, height) {
 		var data_dict = this.DATA_DICT
 		var line_dict= this.LINE_DICT
 		var index = label
+		var svg = this.svg
 
+		$( ".node" ).remove();
 		$.each(data_dict, function( index, value ) {
 
 			// Have colors loop
@@ -138,6 +140,21 @@ function chart(chart_location, width, height) {
 				.style("stroke",color_scheme[line_num]["color"])
 				.attr("id",index)
 				.attr("class","line");
+
+			var nodes = current_g.selectAll('circle.node')
+			  	.data(data_dict[index])
+				.enter().append('g')
+				.attr('class', 'node');
+
+			nodes.append("circle")
+			  .attr('cx', function(d) {return x_scale(d.x);})
+			  .attr('cy', function(d) {return y_scale(d.y);})
+			  .attr('r', 3)
+			  .style("fill",color_scheme[line_num]["color"])
+			  .style('opacity',0.7)
+			  .on("mouseover", function(d) {console.log(d.y)})
+			  .on("mouseover", function() {d3.select(this).attr("r", 6).style("opacity", 1);})
+  			  .on("mouseout", function() {d3.select(this).attr("r", 3).style("opacity", 0.7);});
 
 			line_num = line_num + 1
 
