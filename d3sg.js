@@ -14,7 +14,8 @@ function chart(chart_location, width, height) {
 	this.WIDTH = width - this.MARGIN.left - this.MARGIN.right;
 	this.HEIGHT = height - this.MARGIN.top - this.MARGIN.bottom;
 
-	parseDate = d3.time.format("%Y-%m-%d").parse;
+	format_date = d3.time.format("%Y-%m-%d")
+	parseDate = format_date.parse;
 	this.DATA = []
 	this.DATA_DICT = {}
 	this.LINE_DICT = {}
@@ -51,7 +52,7 @@ function chart(chart_location, width, height) {
 	}
 
 
-	this._create_data_for_d3 = function (x, y, label) {
+	this._create_data_for_d3 = function (x, y, underscore_label, label) {
 
 		// Put in correct format
 		this.DATA = []
@@ -81,7 +82,7 @@ function chart(chart_location, width, height) {
 
 
 
-		this.DATA_DICT[label] = this.DATA
+		this.DATA_DICT[underscore_label] = this.DATA
 
 	}
 
@@ -122,6 +123,10 @@ function chart(chart_location, width, height) {
 		var line_dict= this.LINE_DICT
 		var index = label
 		var svg = this.svg
+		var _mouseover_node = this._mouseover_node
+		var _mousemove_node = this._mousemove_node
+		var _mouseout_node = this._mouseout_node
+
 
 		$( ".node" ).remove();
 		$.each(data_dict, function( index, value ) {
@@ -139,12 +144,16 @@ function chart(chart_location, width, height) {
 				.attr("d", valueline(data_dict[index]))
 				.style("stroke",color_scheme[line_num]["color"])
 				.attr("id",index)
-				.attr("class","line");
+				.attr("class","line")
+				.on("mouseover", function() {d3.select(this).transition().style("stroke-width", 3);})
+				.on("mouseout", function() {d3.select(this).transition().style("stroke-width", 1);});
 
 			var nodes = current_g.selectAll('circle.node')
 			  	.data(data_dict[index])
 				.enter().append('g')
 				.attr('class', 'node');
+
+			console.log(data_dict)
 
 			nodes.append("circle")
 			  .attr('cx', function(d) {return x_scale(d.x);})
@@ -152,9 +161,9 @@ function chart(chart_location, width, height) {
 			  .attr('r', 3)
 			  .style("fill",color_scheme[line_num]["color"])
 			  .style('opacity',0.7)
-			  .on("mouseover", function(d) {console.log(d.y)})
-			  .on("mouseover", function() {d3.select(this).attr("r", 6).style("opacity", 1);})
-  			  .on("mouseout", function() {d3.select(this).attr("r", 3).style("opacity", 0.7);});
+			  .on("mouseover", function(d) {_mouseover_node(d3.select(this), d);})
+			  .on("mousemove", function() {_mousemove_node(d3.select(this))})
+			  .on("mouseout", function() {_mouseout_node(d3.select(this))});
 
 			line_num = line_num + 1
 
@@ -162,6 +171,31 @@ function chart(chart_location, width, height) {
 		
 	}
 	
+	var tooltip = d3.select("body")
+	    .append("div")
+	    .style("position", "absolute")
+	    .attr("class", "tip")
+	    .style("z-index", "10")
+	    .style("visibility", "hidden");
+
+
+	this._mouseover_node = function(node, d) {
+		y_rounded = Math.round(d.y * 100) / 100;
+		x_date = format_date(d.x)
+		text_to_display = x_date + ": " + y_rounded
+		node.transition().attr("r", 6).style("opacity", 1);
+		return tooltip.style("visibility", "visible").text(text_to_display);
+	}
+	this._mouseout_node = function(node) {
+		node.transition().attr("r", 3).style("opacity", 0.7);
+		return tooltip.style("visibility", "hidden");
+	}
+	this._mousemove_node = function(node) {
+		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+	}
+
+
+
 
 	this._draw_bar = function(label, bar_width) {
 
@@ -227,7 +261,7 @@ function chart(chart_location, width, height) {
 		if (label == undefined) {label = underscore_label};
 		this.LABEL_DICT[label] = underscore_label;
 
-		this._create_data_for_d3(x, y, underscore_label);
+		this._create_data_for_d3(x, y, underscore_label, label);
 		this._scale_data(underscore_label);
 		this._add_grid_lines();
 		this._draw_line(underscore_label);
