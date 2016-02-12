@@ -42,10 +42,20 @@ path {
 }
 
 .tip {
-	font: 16px Arial;
+	font: 14px Arial;
 	background-color:#f5f5f5;
 	border-style: solid;
     border-width: 1px;
     border-radius: 5px;
 	padding:5px;
+}
+
+.tip_head {
+	font: 10px Arial;
+	color:#8C8C8C;
+}
+
+.tip_mid {
+	font: 10px Arial;
+	color:#8C8C8C;
 }

@@ -80,14 +80,12 @@ function chart(chart_location, width, height) {
 		});
 		y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
 
-
-
-		this.DATA_DICT[underscore_label] = this.DATA
+		this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA}
 
 	}
 
 
-	this._scale_data = function(label) {
+	this._scale_data = function(underscore_label) {
 
 		var data_dict = this.DATA_DICT
 
@@ -95,8 +93,8 @@ function chart(chart_location, width, height) {
 		var curr_max = 0;
 		var curr_min = 0;
 		$.each(data_dict, function( index, value ) {
-		 	var new_max = d3.max(data_dict[index], function(d) { return d.y; })
-		 	var new_min = d3.min(data_dict[index], function(d) { return d.y; })
+		 	var new_max = d3.max(data_dict[index]["values"], function(d) { return d.y; })
+		 	var new_min = d3.min(data_dict[index]["values"], function(d) { return d.y; })
 
 		 	if (new_max >= curr_max) {
 		  		curr_max = new_max;
@@ -106,13 +104,13 @@ function chart(chart_location, width, height) {
 		 	}
 		});
 
-		var current_data = this.DATA_DICT[label]
+		var current_data = this.DATA_DICT[underscore_label]["values"]
 		x_scale.domain(d3.extent(current_data, function(d) { return d.x; }));
 		y_scale.domain([curr_min, curr_max]);
 	}
 
 
-	this._draw_line = function(label) {
+	this._draw_line = function(underscore_label) {
 
 		this.g.selectAll("path").remove();
 
@@ -121,12 +119,11 @@ function chart(chart_location, width, height) {
 		var line_num = 0;
 		var data_dict = this.DATA_DICT
 		var line_dict= this.LINE_DICT
-		var index = label
+		var index = underscore_label
 		var svg = this.svg
 		var _mouseover_node = this._mouseover_node
 		var _mousemove_node = this._mousemove_node
 		var _mouseout_node = this._mouseout_node
-
 
 		$( ".node" ).remove();
 		$.each(data_dict, function( index, value ) {
@@ -141,7 +138,7 @@ function chart(chart_location, width, height) {
 			line_dict[index] = valueline
 
 			current_g.append("path")
-				.attr("d", valueline(data_dict[index]))
+				.attr("d", valueline(data_dict[index]["values"]))
 				.style("stroke",color_scheme[line_num]["color"])
 				.attr("id",index)
 				.attr("class","line")
@@ -149,11 +146,10 @@ function chart(chart_location, width, height) {
 				.on("mouseout", function() {d3.select(this).transition().style("stroke-width", 1);});
 
 			var nodes = current_g.selectAll('circle.node')
-			  	.data(data_dict[index])
+			  	.data(data_dict[index]["values"])
 				.enter().append('g')
 				.attr('class', 'node');
 
-			console.log(data_dict)
 
 			nodes.append("circle")
 			  .attr('cx', function(d) {return x_scale(d.x);})
@@ -161,7 +157,7 @@ function chart(chart_location, width, height) {
 			  .attr('r', 3)
 			  .style("fill",color_scheme[line_num]["color"])
 			  .style('opacity',0.7)
-			  .on("mouseover", function(d) {_mouseover_node(d3.select(this), d);})
+			  .on("mouseover", function(d) {_mouseover_node(d3.select(this), d, data_dict[index]["label"], color_scheme[line_num]["color"]);})
 			  .on("mousemove", function() {_mousemove_node(d3.select(this))})
 			  .on("mouseout", function() {_mouseout_node(d3.select(this))});
 
@@ -177,14 +173,45 @@ function chart(chart_location, width, height) {
 	    .attr("class", "tip")
 	    .style("z-index", "10")
 	    .style("visibility", "hidden");
+	
+	var tip_head = tooltip
+		.append("div")
+		.attr("class", "tip_head");
+
+	var tip_mid = tooltip
+		.append("div")
+		.attr("class", "tip_mid");
+
+	var tip_foot = tooltip
+		.append("div")
+		.attr("class", "tip_foot");
 
 
-	this._mouseover_node = function(node, d) {
+	this._mouseover_node = function(node, d, label, color) {
+
+		console.log(color)
+
 		y_rounded = Math.round(d.y * 100) / 100;
 		x_date = format_date(d.x)
-		text_to_display = x_date + ": " + y_rounded
+		text_to_display = y_rounded
 		node.transition().attr("r", 6).style("opacity", 1);
-		return tooltip.style("visibility", "visible").text(text_to_display);
+
+		tooltip
+		    .style("visibility", "visible");
+		tip_head
+			.text(label);
+		tip_mid
+			.text(x_date);
+		tip_foot
+			.text(text_to_display)
+			.style("fill", color);
+
+
+
+		// tip_mid = tooltip.append("p")
+			// .text(text_to_display);
+
+		return tooltip
 	}
 	this._mouseout_node = function(node) {
 		node.transition().attr("r", 3).style("opacity", 0.7);
