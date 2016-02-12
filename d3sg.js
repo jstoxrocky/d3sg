@@ -14,11 +14,13 @@ function chart(chart_location, width, height) {
 	this.WIDTH = width - this.MARGIN.left - this.MARGIN.right;
 	this.HEIGHT = height - this.MARGIN.top - this.MARGIN.bottom;
 
-	parseDate = d3.time.format("%Y-%m-%d").parse;
+	format_date = d3.time.format("%Y-%m-%d")
+	parseDate = format_date.parse;
 	this.DATA = []
 	this.DATA_DICT = {}
 	this.LINE_DICT = {}
 	this.chart_location = chart_location
+	this.chart_name = chart_location.substring(1, 4)
 	this.LINE_NUM = 0
 	this.LABEL_DICT = {}
 
@@ -40,6 +42,8 @@ function chart(chart_location, width, height) {
 			.append("svg")
 			.attr("width", this.WIDTH + this.MARGIN.left + this.MARGIN.right)
 			.attr("height", this.HEIGHT + this.MARGIN.top + this.MARGIN.bottom)
+			.attr("class","chart")
+			.attr("id",this.chart_location + "_chart");
 
 		this.svg.append("rect")
 		    .attr("width", "100%")
@@ -51,7 +55,7 @@ function chart(chart_location, width, height) {
 	}
 
 
-	this._create_data_for_d3 = function (x, y, label) {
+	this._create_data_for_d3 = function (x, y, underscore_label, label) {
 
 		// Put in correct format
 		this.DATA = []
@@ -79,14 +83,12 @@ function chart(chart_location, width, height) {
 		});
 		y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
 
-
-
-		this.DATA_DICT[label] = this.DATA
+		this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA}
 
 	}
 
 
-	this._scale_data = function(label) {
+	this._scale_data = function(underscore_label) {
 
 		var data_dict = this.DATA_DICT
 
@@ -94,8 +96,8 @@ function chart(chart_location, width, height) {
 		var curr_max = 0;
 		var curr_min = 0;
 		$.each(data_dict, function( index, value ) {
-		 	var new_max = d3.max(data_dict[index], function(d) { return d.y; })
-		 	var new_min = d3.min(data_dict[index], function(d) { return d.y; })
+		 	var new_max = d3.max(data_dict[index]["values"], function(d) { return d.y; })
+		 	var new_min = d3.min(data_dict[index]["values"], function(d) { return d.y; })
 
 		 	if (new_max >= curr_max) {
 		  		curr_max = new_max;
@@ -105,13 +107,13 @@ function chart(chart_location, width, height) {
 		 	}
 		});
 
-		var current_data = this.DATA_DICT[label]
+		var current_data = this.DATA_DICT[underscore_label]["values"]
 		x_scale.domain(d3.extent(current_data, function(d) { return d.x; }));
-		y_scale.domain([curr_min, curr_max]);
+		y_scale.domain([curr_min, curr_max + 0.4*curr_max]);
 	}
 
 
-	this._draw_line = function(label) {
+	this._draw_line = function(underscore_label) {
 
 		this.g.selectAll("path").remove();
 
@@ -120,8 +122,14 @@ function chart(chart_location, width, height) {
 		var line_num = 0;
 		var data_dict = this.DATA_DICT
 		var line_dict= this.LINE_DICT
-		var index = label
+		var index = underscore_label
+		var svg = this.svg
+		var _draw_nodes = this._draw_nodes
 
+		parent_this = this
+
+		current_g.selectAll('.node_'+parent_this.chart_name).remove()
+		// console.log(a)
 		$.each(data_dict, function( index, value ) {
 
 			// Have colors loop
@@ -134,17 +142,99 @@ function chart(chart_location, width, height) {
 			line_dict[index] = valueline
 
 			current_g.append("path")
-				.attr("d", valueline(data_dict[index]))
+				.attr("d", valueline(data_dict[index]["values"]))
 				.style("stroke",color_scheme[line_num]["color"])
 				.attr("id",index)
-				.attr("class","line");
+				.attr("class","line")
+				.on("mouseover", function() {d3.select(this).transition().style("stroke-width", 3);})
+				.on("mouseout", function() {d3.select(this).transition().style("stroke-width", 1);});
 
+			data_dict[index]["color"] = color_scheme[line_num]["color"]
+			_draw_nodes(parent_this, index, line_num)
 			line_num = line_num + 1
 
 		});
 		
 	}
 	
+	this._draw_nodes = function(parent_this, index, line_num) {
+
+
+
+		var current_g = parent_this.g;
+		var data_dict = parent_this.DATA_DICT
+		var _mouseover_node = parent_this._mouseover_node
+		var _mousemove_node = parent_this._mousemove_node
+		var _mouseout_node = parent_this._mouseout_node
+
+
+		var nodes = current_g.selectAll('circle.node_'+parent_this.chart_name)
+			  	.data(data_dict[index]["values"])
+				.enter().append('g')
+				.attr('class', 'node_'+parent_this.chart_name);
+
+		nodes.append("circle")
+			  .attr('cx', function(d) {return x_scale(d.x);})
+			  .attr('cy', function(d) {return y_scale(d.y);})
+			  .attr('r', 3)
+			  .style("fill", data_dict[index]["color"])
+			  .on("mouseover", function(d) {_mouseover_node(d3.select(this), d, data_dict[index]["label"], data_dict[index]["color"]);})
+			  .on("mousemove", function() {_mousemove_node(d3.select(this))})
+			  .on("mouseout", function() {_mouseout_node(d3.select(this))});
+
+	}
+
+
+
+	var tooltip = d3.select("body")
+	    .append("div")
+	    .style("position", "absolute")
+	    .attr("class", "tip")
+	    .style("z-index", "10")
+	    .style("visibility", "hidden");
+	
+	var tip_head = tooltip
+		.append("div")
+		.attr("class", "tip_head");
+
+	var tip_mid = tooltip
+		.append("div")
+		.attr("class", "tip_mid");
+
+	var tip_foot = tooltip
+		.append("div")
+		.attr("class", "tip_foot");
+
+
+	this._mouseover_node = function(node, d, label, color) {
+
+		y_rounded = Math.round(d.y * 100) / 100;
+		x_date = format_date(d.x)
+		text_to_display = y_rounded
+		node.transition().attr("r", 6).style("opacity", 1);
+
+		tooltip
+		    .style("visibility", "visible");
+		tip_head
+			.text(label);
+		tip_mid
+			.text(x_date);
+		tip_foot
+			.style("color", color)
+			.text(text_to_display);
+
+		return tooltip
+	}
+	this._mouseout_node = function(node) {
+		node.transition().attr("r", 3).style("opacity", 0.7);
+		return tooltip.style("visibility", "hidden");
+	}
+	this._mousemove_node = function(node) {
+		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+	}
+
+
+
 
 	this._draw_bar = function(label, bar_width) {
 
@@ -190,9 +280,9 @@ function chart(chart_location, width, height) {
 		this.svg.selectAll("g.axis").remove();
 
 		xAxis = d3.svg.axis().scale(x_scale)
-			.orient("bottom").ticks(5);
+			.orient("bottom").ticks(15);
 		yAxis = d3.svg.axis().scale(y_scale)
-			.orient("left").ticks(5);
+			.orient("left").ticks(8);
 
 		this.g.append("g") // Add the X Axis
 			.attr("class", "x axis")
@@ -210,7 +300,7 @@ function chart(chart_location, width, height) {
 		if (label == undefined) {label = underscore_label};
 		this.LABEL_DICT[label] = underscore_label;
 
-		this._create_data_for_d3(x, y, underscore_label);
+		this._create_data_for_d3(x, y, underscore_label, label);
 		this._scale_data(underscore_label);
 		this._add_grid_lines();
 		this._draw_line(underscore_label);
@@ -288,13 +378,13 @@ function chart(chart_location, width, height) {
 			return d3.svg.axis()
 			.scale(this.x_scale)
 			.orient("bottom")
-			.ticks(6)
+			.ticks(15)
 		}
 		function make_y_axis() {
 			return d3.svg.axis()
 			.scale(this.y_scale)
 			.orient("left")
-			.ticks(5)
+			.ticks(8)
 		}
 
 		this.g.append("g")
@@ -363,6 +453,7 @@ function chart(chart_location, width, height) {
 
 
 	this._add_legend = function(label) {
+
 
 		this.svg.append("text")
 			.attr("y", this.LINE_NUM*15 + this.MARGIN.top) // adding goes down

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>d3sg.js Dashboard</title>
+        <script src="https://codeorigin.jquery.com/jquery-2.0.3.min.js"></script> 
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.js"></script>
+        <script src="d3sg.js"></script>
+        <link href="d3sg_style.css" type="text/css" rel="stylesheet">
+        <script src="simple_example.js"></script>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+        <style>
+            body {
+                background-color: #f5f5f5;
+            }
+
+            .container {
+                width:75%;
+            }
+
+            .cells {
+                /*border:1px solid black;*/
+                text-align:center;
+                /*width:800px;*/
+                /*width:100%;*/
+                height:400px;
+                padding:0px;
+            }
+
+
+
+
+        </style>
+
+    </head>
+
+    
+
+    <body>
+
+        <div class='container' >
+            <div class='row'>
+                <div class='col-lg-12'><h1>Sample Dashboard</h1></div>
+            </div>
+        </div>
+        <div class='container'>
+
+                <div class='row'>
+                    <div class='cells col-lg-6'><div id="ch1"></div></div>
+                    <div class='cells col-lg-6'><div id="ch2"></div></div>
+                </div>
+                <div class='row'>
+                    <div class='cells col-lg-6'><div id="ch3"></div></div>
+                    <div class='cells col-lg-6'><div id="ch4"></div></div>
+
+            </div>
+        </div>
+
+    </body>
+</html> 
