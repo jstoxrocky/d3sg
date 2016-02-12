@@ -20,6 +20,7 @@ function chart(chart_location, width, height) {
 	this.DATA_DICT = {}
 	this.LINE_DICT = {}
 	this.chart_location = chart_location
+	this.chart_name = chart_location.substring(1, 4)
 	this.LINE_NUM = 0
 	this.LABEL_DICT = {}
 
@@ -41,6 +42,8 @@ function chart(chart_location, width, height) {
 			.append("svg")
 			.attr("width", this.WIDTH + this.MARGIN.left + this.MARGIN.right)
 			.attr("height", this.HEIGHT + this.MARGIN.top + this.MARGIN.bottom)
+			.attr("class","chart")
+			.attr("id",this.chart_location + "_chart");
 
 		this.svg.append("rect")
 		    .attr("width", "100%")
@@ -106,7 +109,7 @@ function chart(chart_location, width, height) {
 
 		var current_data = this.DATA_DICT[underscore_label]["values"]
 		x_scale.domain(d3.extent(current_data, function(d) { return d.x; }));
-		y_scale.domain([curr_min, curr_max]);
+		y_scale.domain([curr_min, curr_max + 0.4*curr_max]);
 	}
 
 
@@ -121,11 +124,12 @@ function chart(chart_location, width, height) {
 		var line_dict= this.LINE_DICT
 		var index = underscore_label
 		var svg = this.svg
-		var _mouseover_node = this._mouseover_node
-		var _mousemove_node = this._mousemove_node
-		var _mouseout_node = this._mouseout_node
+		var _draw_nodes = this._draw_nodes
 
-		$( ".node" ).remove();
+		parent_this = this
+
+		current_g.selectAll('.node_'+parent_this.chart_name).remove()
+		// console.log(a)
 		$.each(data_dict, function( index, value ) {
 
 			// Have colors loop
@@ -145,29 +149,43 @@ function chart(chart_location, width, height) {
 				.on("mouseover", function() {d3.select(this).transition().style("stroke-width", 3);})
 				.on("mouseout", function() {d3.select(this).transition().style("stroke-width", 1);});
 
-			var nodes = current_g.selectAll('circle.node')
-			  	.data(data_dict[index]["values"])
-				.enter().append('g')
-				.attr('class', 'node');
-
 			data_dict[index]["color"] = color_scheme[line_num]["color"]
-
-			nodes.append("circle")
-			  .attr('cx', function(d) {return x_scale(d.x);})
-			  .attr('cy', function(d) {return y_scale(d.y);})
-			  .attr('r', 3)
-			  .style("fill",color_scheme[line_num]["color"])
-			  .style('opacity',0.7)
-			  .on("mouseover", function(d) {_mouseover_node(d3.select(this), d, data_dict[index]["label"], data_dict[index]["color"]);})
-			  .on("mousemove", function() {_mousemove_node(d3.select(this))})
-			  .on("mouseout", function() {_mouseout_node(d3.select(this))});
-
+			_draw_nodes(parent_this, index, line_num)
 			line_num = line_num + 1
 
 		});
 		
 	}
 	
+	this._draw_nodes = function(parent_this, index, line_num) {
+
+
+
+		var current_g = parent_this.g;
+		var data_dict = parent_this.DATA_DICT
+		var _mouseover_node = parent_this._mouseover_node
+		var _mousemove_node = parent_this._mousemove_node
+		var _mouseout_node = parent_this._mouseout_node
+
+
+		var nodes = current_g.selectAll('circle.node_'+parent_this.chart_name)
+			  	.data(data_dict[index]["values"])
+				.enter().append('g')
+				.attr('class', 'node_'+parent_this.chart_name);
+
+		nodes.append("circle")
+			  .attr('cx', function(d) {return x_scale(d.x);})
+			  .attr('cy', function(d) {return y_scale(d.y);})
+			  .attr('r', 3)
+			  .style("fill", data_dict[index]["color"])
+			  .on("mouseover", function(d) {_mouseover_node(d3.select(this), d, data_dict[index]["label"], data_dict[index]["color"]);})
+			  .on("mousemove", function() {_mousemove_node(d3.select(this))})
+			  .on("mouseout", function() {_mouseout_node(d3.select(this))});
+
+	}
+
+
+
 	var tooltip = d3.select("body")
 	    .append("div")
 	    .style("position", "absolute")
@@ -204,12 +222,6 @@ function chart(chart_location, width, height) {
 		tip_foot
 			.style("color", color)
 			.text(text_to_display);
-			
-
-
-
-		// tip_mid = tooltip.append("p")
-			// .text(text_to_display);
 
 		return tooltip
 	}
@@ -268,9 +280,9 @@ function chart(chart_location, width, height) {
 		this.svg.selectAll("g.axis").remove();
 
 		xAxis = d3.svg.axis().scale(x_scale)
-			.orient("bottom").ticks(5);
+			.orient("bottom").ticks(15);
 		yAxis = d3.svg.axis().scale(y_scale)
-			.orient("left").ticks(5);
+			.orient("left").ticks(8);
 
 		this.g.append("g") // Add the X Axis
 			.attr("class", "x axis")
@@ -366,13 +378,13 @@ function chart(chart_location, width, height) {
 			return d3.svg.axis()
 			.scale(this.x_scale)
 			.orient("bottom")
-			.ticks(6)
+			.ticks(15)
 		}
 		function make_y_axis() {
 			return d3.svg.axis()
 			.scale(this.y_scale)
 			.orient("left")
-			.ticks(5)
+			.ticks(8)
 		}
 
 		this.g.append("g")
@@ -441,6 +453,7 @@ function chart(chart_location, width, height) {
 
 
 	this._add_legend = function(label) {
+
 
 		this.svg.append("text")
 			.attr("y", this.LINE_NUM*15 + this.MARGIN.top) // adding goes down
