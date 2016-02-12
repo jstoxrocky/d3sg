@@ -150,6 +150,7 @@ function chart(chart_location, width, height) {
 				.enter().append('g')
 				.attr('class', 'node');
 
+			data_dict[index]["color"] = color_scheme[line_num]["color"]
 
 			nodes.append("circle")
 			  .attr('cx', function(d) {return x_scale(d.x);})
@@ -157,7 +158,7 @@ function chart(chart_location, width, height) {
 			  .attr('r', 3)
 			  .style("fill",color_scheme[line_num]["color"])
 			  .style('opacity',0.7)
-			  .on("mouseover", function(d) {_mouseover_node(d3.select(this), d, data_dict[index]["label"], color_scheme[line_num]["color"]);})
+			  .on("mouseover", function(d) {_mouseover_node(d3.select(this), d, data_dict[index]["label"], data_dict[index]["color"]);})
 			  .on("mousemove", function() {_mousemove_node(d3.select(this))})
 			  .on("mouseout", function() {_mouseout_node(d3.select(this))});
 
@@ -189,8 +190,6 @@ function chart(chart_location, width, height) {
 
 	this._mouseover_node = function(node, d, label, color) {
 
-		console.log(color)
-
 		y_rounded = Math.round(d.y * 100) / 100;
 		x_date = format_date(d.x)
 		text_to_display = y_rounded
@@ -203,8 +202,9 @@ function chart(chart_location, width, height) {
 		tip_mid
 			.text(x_date);
 		tip_foot
-			.text(text_to_display)
-			.style("fill", color);
+			.style("color", color)
+			.text(text_to_display);
+			
 
 
 
