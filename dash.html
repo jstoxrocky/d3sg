@@ -8,14 +8,11 @@
         <script src="d3sg.js"></script>
         <link href="d3sg_style.css" type="text/css" rel="stylesheet">
         <script src="simple_example.js"></script>
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-        <!-- Optional theme -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+        <link href="../bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+        <link href="../bootstrap/css/bootstrap-theme.min.css" type="text/css" rel="stylesheet">
+        <script src="../bootstrap/js/bootstrap.min.js"></script>
 
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
 
         <style>
@@ -25,7 +22,11 @@
 
             .container {
                 width:75%;
+                /*padding-left:0px;*/
+                /*padding-right:0px;*/
+                
             }
+
 
             .cells {
                 /*border:1px solid black;*/
@@ -36,7 +37,37 @@
                 padding:0px;
             }
 
+            .chart_container {
+                /*background-color:#eabcd8;*/
+            }
 
+            .title_cell  {
+                /*text-align: left;*/
+                /*background-color: #abc000;*/
+                /*height:50px;*/
+                /*padding:0px;*/
+            }
+
+            .title {
+                width:800px;
+                /*height:100px;*/
+                /*background-color:#eabcd8;*/
+                margin: 0 auto; 
+                text-align:left;
+            }
+
+            .tab-pane {
+                /*background-color:#eabcd8;*/
+            }
+
+ /*           .tab-content.clearfix {
+                width:100%;
+                padding:0px;
+            }*/
+
+            #exTab1 {
+                padding:0px;
+            }
 
 
         </style>
@@ -47,13 +78,45 @@
 
     <body>
 
-        <div class='container' >
-            <div class='row'>
-                <div class='col-lg-12'><h1>Sample Dashboard</h1></div>
-            </div>
-        </div>
-        <div class='container'>
 
+<!--         <div class="container"><h1>Sample Dashboard</h1></div>
+        <div id="exTab1" class="container"> 
+            <ul  class="nav nav-pills">
+                <li class="active"><a  href="#1a" data-toggle="tab">Main</a></li>
+                <li><a href="#2a" data-toggle="tab">Mobile</a></li>
+                <li><a href="#3a" data-toggle="tab">Marketing</a></li>
+                <li><a href="#4a" data-toggle="tab">Messaging</a></li>
+            </ul>
+
+            <div class="tab-content clearfix">
+                <div class="tab-pane active" id="1a">
+                </div>
+
+                <div class="tab-pane" id="2a">
+                    <h3>We use the class nav-pills instead of nav-tabs which automatically creates a background color for the tab</h3>
+                </div>
+
+                <div class="tab-pane" id="3a">
+                    <h3>We applied clearfix to the tab-content to rid of the gap between the tab and the content</h3>
+                </div>
+
+                <div class="tab-pane" id="4a">
+                    <h3>We use css to change the background color of the content to be equal to the tab</h3>
+                </div>
+            </div>
+
+        </div>
+ -->
+
+
+
+
+
+        <div class='container chart_container'>
+                <div class='row'>
+                    <div class='title_cell col-lg-6'><div class='title'><h1>Sample Dashboard</h1></div></div>
+                    <div class='title_cell col-lg-6'><div class='title'></div></div>
+                </div>
                 <div class='row'>
                     <div class='cells col-lg-6'><div id="ch1"></div></div>
                     <div class='cells col-lg-6'><div id="ch2"></div></div>
@@ -61,7 +124,6 @@
                 <div class='row'>
                     <div class='cells col-lg-6'><div id="ch3"></div></div>
                     <div class='cells col-lg-6'><div id="ch4"></div></div>
-
             </div>
         </div>
 
