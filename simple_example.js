@@ -11,7 +11,7 @@ $(document).ready(function(){
 		return val_to_push
 	}
 	// X axis values
-	x = d3.time.day.range(new Date(2013, 2, 1), new Date(2013, 4, 6))
+	x = d3.time.day.range(new Date(2013, 1, 1), new Date(2013, 3, 6))
 	for (var i=0; i < x.length; i++) {
 		x[i] = x[i].toISOString().substring(0, 10);
 	}
@@ -42,8 +42,7 @@ $(document).ready(function(){
 	ch2.set_ylabel("(USD)");
 
 	ch3 = new chart("#ch3");
-	ch3.line(x, rand_y(), 'Two Year');
-	ch3.line(x, rand_y(), 'Three Year');
+	ch3.bar(x, rand_y(), 'Two Year');
 	ch3.set_title("Two and Three Year T-Bill Prices");
 	ch3.set_subtitle("The price of the two and three year T-Bills appear to follow a random walk.");
 	ch3.set_ylabel("(USD)");

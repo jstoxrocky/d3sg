@@ -1,3 +1,14 @@
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+    return array;
+}
+
+
 function chart(chart_location, width, height) {
 
 
@@ -35,6 +46,8 @@ function chart(chart_location, width, height) {
               {"color":"#F15854","alpha":1,'linestyle':'-'},
               {"color":"#4D4D4D","alpha":1,'linestyle':'-'},]
 
+    // this._LOLLIPOP = shuffleArray(this._LOLLIPOP)
+
 
 	this._create_canvas = function() {
 
@@ -57,6 +70,8 @@ function chart(chart_location, width, height) {
 
 	this._create_data_for_d3 = function (x, y, underscore_label, label) {
 
+		width = this.WIDTH
+
 		// Put in correct format
 		this.DATA = []
 			for (var i = 0; i < x.length; i += 1) {
@@ -66,21 +81,9 @@ function chart(chart_location, width, height) {
 			    this.DATA.push(current_dict);
 			}
 
-		// Make sure X is dates, Y is numeric
-		try {
-		    this.DATA.forEach(function(d) {
-				d.x = parseDate(d.x);
-			});
-			x_scale = d3.time.scale().range([0, this.WIDTH]);
-		}
-		catch(err) {
-			x_scale = d3.scale.linear().range([0, this.WIDTH]);
-		}
 
-		// y
-		this.DATA.forEach(function(d) {
-			d.y = +d.y;
-		});
+		// X scale different for line and bar charts. You can find the x_scale 
+		// in the this.line and this.bar chart methods
 		y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
 
 		this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA}
@@ -93,9 +96,10 @@ function chart(chart_location, width, height) {
 		var data_dict = this.DATA_DICT
 
 		// Get global max
-		var curr_max = 0;
-		var curr_min = 0;
+		
 		$.each(data_dict, function( index, value ) {
+			var curr_max = 0;
+			var curr_min = 0;
 		 	var new_max = d3.max(data_dict[index]["values"], function(d) { return d.y; })
 		 	var new_min = d3.min(data_dict[index]["values"], function(d) { return d.y; })
 
@@ -109,7 +113,12 @@ function chart(chart_location, width, height) {
 
 		var current_data = this.DATA_DICT[underscore_label]["values"]
 		x_scale.domain(d3.extent(current_data, function(d) { return d.x; }));
-		y_scale.domain([curr_min, curr_max + 0.4*curr_max]);
+		// y_scale.domain([curr_min, curr_max + 0.4*curr_max]);
+		y_extent = d3.extent(current_data, function(d) { return d.y; })
+		y_extent[1] = y_extent[1] + 0.02*y_extent[1]
+		y_extent[0] = y_extent[0] - 0.02*y_extent[0]
+		y_scale.domain(y_extent)
+
 	}
 
 
@@ -133,7 +142,7 @@ function chart(chart_location, width, height) {
 		$.each(data_dict, function( index, value ) {
 
 			// Have colors loop
-			line_num = line_num % 9;
+			line_num = line_num % 8;
 
 			var valueline = d3.svg.line()
 				.x( function(d) { return x_scale(d.x); })
@@ -226,7 +235,7 @@ function chart(chart_location, width, height) {
 		return tooltip
 	}
 	this._mouseout_node = function(node) {
-		node.transition().attr("r", 3).style("opacity", 0.7);
+		node.transition().attr("r", 3);
 		return tooltip.style("visibility", "hidden");
 	}
 	this._mousemove_node = function(node) {
@@ -249,24 +258,31 @@ function chart(chart_location, width, height) {
 		var margin = this.MARGIN
 		var height = this.HEIGHT
 		var index = label
+		var width = this.WIDTH
 
+		n_series = Object.keys(data_dict).length
+		current_g.selectAll(".bar").remove();
 
 		$.each(data_dict, function( index, value ) {
 
 			// Have colors loop
 			line_num = line_num % 9;
+			bar_width = width / (n_series*data_dict[index]["values"].length) - 0.5
+			bar_width = bar_width / n_series
 
-			var bar = svg.selectAll("rect.bar")
-			    .data(data_dict[index])
+			var bar = current_g.selectAll("rect.bar")
+			    .data(data_dict[index]["values"])
 			  .enter().append("g")
-			    .attr("transform", function(d, i) {return "translate(" + (x_scale(d.x)+margin.left) + ", " + (y_scale(d.y)+margin.top) + ")"; })
+			    .attr("transform", function(d, i) {return "translate(" + (bar_width*line_num + x_scale(d.x) - bar_width/2) +  ", " + (y_scale(d.y)) + ")"; })
 			    .attr("class","bar");
 
 			bar.append("rect")
 			    .attr("height", function(d) { return height - y_scale(d.y); })
 			    .attr("width", bar_width)
 			    .style("stroke-width",0)
-			    .style("fill",color_scheme[line_num]["color"]);
+			    .style("fill",color_scheme[line_num]["color"])
+			    .on("mouseover", function(d) {d3.select(this).style("opacity", 0.5);})
+			    .on("mouseout", function(d) {d3.select(this).style("opacity", 1);});
 
 			line_num = line_num + 1
 
@@ -277,19 +293,46 @@ function chart(chart_location, width, height) {
 
 	this._add_axes = function() {
 
-		this.svg.selectAll("g.axis").remove();
+
+		// this.svg.selectAll("g.axis").remove();
+
+		// console.log(this.svg.selectAll('g.axis'))
+		this.svg.selectAll('g.axis').remove()
+
+		// var current_g = this.g
+		// console.log(current_g.selectAll(".tick"))
+		// current_g.selectAll(".tick").remove();
+		
 
 		xAxis = d3.svg.axis().scale(x_scale)
-			.orient("bottom").ticks(15);
+			.orient("bottom").ticks(10)
+			.tickFormat(format_date);;
 		yAxis = d3.svg.axis().scale(y_scale)
-			.orient("left").ticks(8);
+			.orient("left").ticks(7);
 
-		this.g.append("g") // Add the X Axis
-			.attr("class", "x axis")
+		var dateTicks = this.g.append("g") // Add the X Axis
+			.attr("class", "axis")
 			.attr("transform", "translate(0," + this.HEIGHT + ")")
-			.call(xAxis);
+			.call(xAxis)
+			.selectAll('.tick');
+
+		for (var j = 0; j < dateTicks[0].length; j++) {
+		  var c = dateTicks[0][j],
+		      n = dateTicks[0][j+1];
+		  if (!c || !n || !c.getBoundingClientRect || !n.getBoundingClientRect)
+		    continue;
+		  while (c.getBoundingClientRect().right > n.getBoundingClientRect().left) {
+		    d3.select(n).remove();
+		    j++;
+		    n = dateTicks[0][j+1];
+		    if (!n)
+		      break;
+		  }
+		}
+
+
 		this.g.append("g") // Add the Y Axis
-			.attr("class", "y axis")
+			.attr("class", "axis")
 			.call(yAxis);
 	}
 
@@ -301,6 +344,11 @@ function chart(chart_location, width, height) {
 		this.LABEL_DICT[label] = underscore_label;
 
 		this._create_data_for_d3(x, y, underscore_label, label);
+		// Line
+		this.DATA.forEach(function(d) {
+			d.x = parseDate(d.x)
+		});
+		x_scale = d3.time.scale().range([0, this.WIDTH]); // Line
 		this._scale_data(underscore_label);
 		this._add_grid_lines();
 		this._draw_line(underscore_label);
@@ -314,6 +362,8 @@ function chart(chart_location, width, height) {
 
 	this.bar = function(x, y, label, bar_width) {
 
+
+
 		if (bar_width == undefined){
 			bar_width=2
 		}
@@ -323,6 +373,13 @@ function chart(chart_location, width, height) {
 		this.LABEL_DICT[label] = underscore_label;
 
 		this._create_data_for_d3(x, y, underscore_label);
+		// Bar
+		this.DATA.forEach(function(d) {
+			split_x = d.x.split("-")
+			d.x = new Date(Date.UTC(split_x[0],split_x[1]-1,split_x[2],0,0,0));
+		});
+		x_scale = d3.time.scale().range([width/this.DATA.length/2, width-width/this.DATA.length/2]); // Bar
+
 		this._scale_data(underscore_label);
 		this._add_grid_lines();
 
