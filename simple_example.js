@@ -27,27 +27,27 @@ $(document).ready(function(){
 	//------------------------------------------------------------------------------//
 	// CREATE CHART
 	//------------------------------------------------------------------------------//
-	ch1 = new chart("#ch1");
+	ch1 = new chart("ch1");
 	ch1.line(x, rand_y(), 'Three Month');
 	ch1.line(x, rand_y(), 'Six Month');
 	ch1.set_title("Three and Six Month T-Bill Prices");
 	ch1.set_subtitle("The price of the three and six month T-Bills appear to follow a random walk.");
 	ch1.set_ylabel("(USD)");
 
-	ch2 = new chart("#ch2");
+	ch2 = new chart("ch2");
 	ch2.line(x, rand_y(), 'Eight Month');
 	ch2.line(x, rand_y(), 'Twelve Month');
 	ch2.set_title("Eight and Twelve Month T-Bill Prices");
 	ch2.set_subtitle("The price of the eight and twelve month T-Bills appear to follow a random walk.");
 	ch2.set_ylabel("(USD)");
 
-	ch3 = new chart("#ch3");
+	ch3 = new chart("ch3");
 	ch3.bar(x, rand_y(), 'Two Year');
 	ch3.set_title("Two and Three Year T-Bill Prices");
 	ch3.set_subtitle("The price of the two and three year T-Bills appear to follow a random walk.");
 	ch3.set_ylabel("(USD)");
 
-	ch4 = new chart("#ch4");
+	ch4 = new chart("ch4");
 	ch4.line(x, rand_y(), 'Five Year');
 	ch4.line(x, rand_y(), 'Ten Year');
 	ch4.set_title("Five and Ten Year T-Bill Prices");
