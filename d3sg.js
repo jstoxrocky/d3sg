@@ -1,14 +1,3 @@
-function shuffleArray(array) {
-    for (var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-    }
-    return array;
-}
-
-
 function chart(chart_location, width, height) {
 
 
@@ -18,6 +7,8 @@ function chart(chart_location, width, height) {
 	if (height == undefined) {
 		height = 400
 	}
+
+	
 
 	$(chart_location).empty();
 
@@ -30,8 +21,12 @@ function chart(chart_location, width, height) {
 	this.DATA = []
 	this.DATA_DICT = {}
 	this.LINE_DICT = {}
-	this.chart_location = chart_location
-	this.chart_name = chart_location.substring(1, 4)
+	this.chart_location = "#"+chart_location
+
+
+	this.chart_name = chart_location//.substring(1, 4)
+
+
 	this.LINE_NUM = 0
 	this.LABEL_DICT = {}
 
@@ -56,7 +51,7 @@ function chart(chart_location, width, height) {
 			.attr("width", this.WIDTH + this.MARGIN.left + this.MARGIN.right)
 			.attr("height", this.HEIGHT + this.MARGIN.top + this.MARGIN.bottom)
 			.attr("class","chart")
-			.attr("id",this.chart_location + "_chart");
+			.attr("id",this.chart_name + "_chart");
 
 		this.svg.append("rect")
 		    .attr("width", "100%")
@@ -70,7 +65,19 @@ function chart(chart_location, width, height) {
 
 	this._create_data_for_d3 = function (x, y, underscore_label, label) {
 
-		width = this.WIDTH
+		var pct_chng = []
+		$.each(y, function( index, value ) {
+			try {
+			    prev_val = y[index-7];
+			}
+			catch(err) {
+			    prev_val = 1;
+			}
+			curr_pct_chng = 100*(value - prev_val) / prev_val
+			pct_chng.push(curr_pct_chng)
+			prev_val = value
+		});
+
 
 		// Put in correct format
 		this.DATA = []
@@ -78,8 +85,11 @@ function chart(chart_location, width, height) {
 				var current_dict = {};
 				current_dict['y'] = y[i];
 				current_dict['x'] = x[i];
+				current_dict['delta'] = pct_chng[i];
 			    this.DATA.push(current_dict);
 			}
+
+		
 
 
 		// X scale different for line and bar charts. You can find the x_scale 
@@ -95,11 +105,12 @@ function chart(chart_location, width, height) {
 
 		var data_dict = this.DATA_DICT
 
-		// Get global max
+		// console.log(data_dict)
 		
+		var curr_max = -1000000;
+		var curr_min = 1000000;
 		$.each(data_dict, function( index, value ) {
-			var curr_max = 0;
-			var curr_min = 0;
+			
 		 	var new_max = d3.max(data_dict[index]["values"], function(d) { return d.y; })
 		 	var new_min = d3.min(data_dict[index]["values"], function(d) { return d.y; })
 
@@ -111,18 +122,24 @@ function chart(chart_location, width, height) {
 		 	}
 		});
 
+		delta = curr_max - curr_min
+
 		var current_data = this.DATA_DICT[underscore_label]["values"]
 		x_scale.domain(d3.extent(current_data, function(d) { return d.x; }));
-		// y_scale.domain([curr_min, curr_max + 0.4*curr_max]);
-		y_extent = d3.extent(current_data, function(d) { return d.y; })
-		y_extent[1] = y_extent[1] + 0.02*y_extent[1]
-		y_extent[0] = y_extent[0] - 0.02*y_extent[0]
-		y_scale.domain(y_extent)
+		y_scale.domain([curr_min - 0.1*delta, curr_max + 0.1*delta*this.LINE_NUM]);
+
+		// adjust = y_scale.invert()
+
+
+		// y_scale.domain([curr_min, this.LINE_NUM*15 + this.MARGIN.top]);
 
 	}
 
 
 	this._draw_line = function(underscore_label) {
+
+
+
 
 		this.g.selectAll("path").remove();
 
@@ -153,17 +170,22 @@ function chart(chart_location, width, height) {
 			current_g.append("path")
 				.attr("d", valueline(data_dict[index]["values"]))
 				.style("stroke",color_scheme[line_num]["color"])
+				.style("stroke-width", 2)
 				.attr("id",index)
 				.attr("class","line")
-				.on("mouseover", function() {d3.select(this).transition().style("stroke-width", 3);})
-				.on("mouseout", function() {d3.select(this).transition().style("stroke-width", 1);});
+				.on("mouseover", function() {d3.select(this).transition().style("stroke-width", 4);})
+				.on("mouseout", function() {d3.select(this).transition().style("stroke-width", 2);});
 
 			data_dict[index]["color"] = color_scheme[line_num]["color"]
 			_draw_nodes(parent_this, index, line_num)
 			line_num = line_num + 1
 
+
 		});
+
 		
+
+
 	}
 	
 	this._draw_nodes = function(parent_this, index, line_num) {
@@ -214,12 +236,20 @@ function chart(chart_location, width, height) {
 		.append("div")
 		.attr("class", "tip_foot");
 
+	var tip_foot2 = tooltip
+		.append("div")
+		.attr("class", "tip_foot2");
+
 
 	this._mouseover_node = function(node, d, label, color) {
 
 		y_rounded = Math.round(d.y * 100) / 100;
+		delta_rounded = Math.round(d.delta * 100) / 100;
+		if (delta_rounded >= 0) {wow_color = "#458B00"} else {wow_color = "#CD2626"}
 		x_date = format_date(d.x)
 		text_to_display = y_rounded
+
+
 		node.transition().attr("r", 6).style("opacity", 1);
 
 		tooltip
@@ -230,7 +260,10 @@ function chart(chart_location, width, height) {
 			.text(x_date);
 		tip_foot
 			.style("color", color)
-			.text(text_to_display);
+			.text("Value: " + text_to_display);
+		tip_foot2
+			.style("color", wow_color)
+			.text("WoW: " + delta_rounded + "%");
 
 		return tooltip
 	}
@@ -294,15 +327,7 @@ function chart(chart_location, width, height) {
 	this._add_axes = function() {
 
 
-		// this.svg.selectAll("g.axis").remove();
-
-		// console.log(this.svg.selectAll('g.axis'))
 		this.svg.selectAll('g.axis').remove()
-
-		// var current_g = this.g
-		// console.log(current_g.selectAll(".tick"))
-		// current_g.selectAll(".tick").remove();
-		
 
 		xAxis = d3.svg.axis().scale(x_scale)
 			.orient("bottom").ticks(10)
@@ -316,19 +341,18 @@ function chart(chart_location, width, height) {
 			.call(xAxis)
 			.selectAll('.tick');
 
+
+		// Hacky solution
+		// Edit the number 2 int he future to be more responsive
 		for (var j = 0; j < dateTicks[0].length; j++) {
-		  var c = dateTicks[0][j],
-		      n = dateTicks[0][j+1];
-		  if (!c || !n || !c.getBoundingClientRect || !n.getBoundingClientRect)
-		    continue;
-		  while (c.getBoundingClientRect().right > n.getBoundingClientRect().left) {
-		    d3.select(n).remove();
-		    j++;
-		    n = dateTicks[0][j+1];
-		    if (!n)
-		      break;
-		  }
+			var c = dateTicks[0][j]
+			if (j%2 != 0) {
+				d3.select(c).remove();
+			}
 		}
+
+
+
 
 
 		this.g.append("g") // Add the Y Axis
