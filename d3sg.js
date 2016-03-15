@@ -1,4 +1,4 @@
-function chart(chart_location, width, height) {
+function chart(width, height) {
 
 
 	if (width == undefined) {
@@ -8,9 +8,7 @@ function chart(chart_location, width, height) {
 		height = 400
 	}
 
-	
 
-	$(chart_location).empty();
 
 	this.MARGIN = {top: 80, right: 50, bottom: 50, left: 70};
 	this.WIDTH = width - this.MARGIN.left - this.MARGIN.right;
@@ -18,15 +16,10 @@ function chart(chart_location, width, height) {
 
 	format_date = d3.time.format("%Y-%m-%d")
 	parseDate = format_date.parse;
+	bisectDate = d3.bisector(function(d) { return d.date; }).left;
 	this.DATA = []
 	this.DATA_DICT = {}
 	this.LINE_DICT = {}
-	this.chart_location = "#"+chart_location
-
-
-	this.chart_name = chart_location//.substring(1, 4)
-
-
 	this.LINE_NUM = 0
 	this.LABEL_DICT = {}
 
@@ -46,12 +39,10 @@ function chart(chart_location, width, height) {
 
 	this._create_canvas = function() {
 
-		this.svg = d3.select(this.chart_location)
-			.append("svg")
+		this.svg = d3.select(document.createElementNS(d3.ns.prefix.svg, 'svg'))
 			.attr("width", this.WIDTH + this.MARGIN.left + this.MARGIN.right)
 			.attr("height", this.HEIGHT + this.MARGIN.top + this.MARGIN.bottom)
-			.attr("class","chart")
-			.attr("id",this.chart_name + "_chart");
+			.attr("class","chart");
 
 		this.svg.append("rect")
 		    .attr("width", "100%")
@@ -128,17 +119,11 @@ function chart(chart_location, width, height) {
 		x_scale.domain(d3.extent(current_data, function(d) { return d.x; }));
 		y_scale.domain([curr_min - 0.1*delta, curr_max + 0.1*delta*this.LINE_NUM]);
 
-		// adjust = y_scale.invert()
-
-
-		// y_scale.domain([curr_min, this.LINE_NUM*15 + this.MARGIN.top]);
 
 	}
 
 
 	this._draw_line = function(underscore_label) {
-
-
 
 
 		this.g.selectAll("path").remove();
@@ -154,7 +139,7 @@ function chart(chart_location, width, height) {
 
 		parent_this = this
 
-		current_g.selectAll('.node_'+parent_this.chart_name).remove()
+		this.g.selectAll('.node').remove()
 		// console.log(a)
 		$.each(data_dict, function( index, value ) {
 
@@ -181,16 +166,40 @@ function chart(chart_location, width, height) {
 			line_num = line_num + 1
 
 
+
+
+
+
+
+			// show_node = function(parent_this) {
+			// 	var x0 = x_scale.invert(d3.mouse(parent_this)[0]); 
+			// 	console.log(x0)
+			// }
+
+			//--------------------
+		    // svg.append("rect")
+		    // 	.data(data_dict[index]["values"])
+		    //     .attr("width", width)
+		    //     .attr("height", height)
+		    //     .attr("class",'joey')
+		    //     .style("fill", "none")
+		    //     .style("pointer-events", "all")
+		    //     .on("mousemove", function() {show_node(this)});
+
+		    // ------------------
+
+
 		});
 
-		
 
 
 	}
 	
+
+
+
+
 	this._draw_nodes = function(parent_this, index, line_num) {
-
-
 
 		var current_g = parent_this.g;
 		var data_dict = parent_this.DATA_DICT
@@ -198,11 +207,10 @@ function chart(chart_location, width, height) {
 		var _mousemove_node = parent_this._mousemove_node
 		var _mouseout_node = parent_this._mouseout_node
 
-
-		var nodes = current_g.selectAll('circle.node_'+parent_this.chart_name)
+		var nodes = current_g.selectAll('circle.node')
 			  	.data(data_dict[index]["values"])
 				.enter().append('g')
-				.attr('class', 'node_'+parent_this.chart_name);
+				.attr('class', 'node');
 
 		nodes.append("circle")
 			  .attr('cx', function(d) {return x_scale(d.x);})
@@ -213,7 +221,7 @@ function chart(chart_location, width, height) {
 			  .on("mousemove", function() {_mousemove_node(d3.select(this))})
 			  .on("mouseout", function() {_mouseout_node(d3.select(this))});
 
-	}
+		}
 
 
 
@@ -516,7 +524,7 @@ function chart(chart_location, width, height) {
 			this._scale_data(underscore_label);
 			data = this.DATA_DICT[underscore_label]
 			// Select the section we want to apply our changes to
-			var svg = d3.select(this.chart_location).transition();
+			// var svg = d3.select(this.chart_location).transition();
 			// Make the changes
 
 
@@ -576,5 +584,5 @@ function chart(chart_location, width, height) {
 	// 	.text("Date");
 
 
-
+	
 };

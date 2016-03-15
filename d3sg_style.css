@@ -59,3 +59,17 @@ path {
 	font: 12px Arial;
 	color:#8C8C8C;
 }
+
+
+
+
+
+.rule {
+    height: 90%;
+    position: absolute;
+    border-right: 1px dotted #000;
+    text-align: right;
+}
+span {
+    margin-right: 0.5em;
+}
