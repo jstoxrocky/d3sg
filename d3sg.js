@@ -283,7 +283,7 @@ function chart(width, height) {
 		return tooltip.style("visibility", "hidden");
 	}
 	this._mousemove_node = function(node) {
-		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+		return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
 	}
 
 
