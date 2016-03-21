@@ -1,6 +1,6 @@
 function chart(style_name) {
 
-    ipython_style = {width:1000, height:400, name:'ipython', bg_color:'#ffffff'}
+    ipython_style = {width:1000, height:400, name:'ipython', bg_color:'#f5f5f5'}
     dash_style = {width:800, height:400, name:'dash', bg_color:'#f5f5f5'}
 
 
