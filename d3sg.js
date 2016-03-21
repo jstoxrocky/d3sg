@@ -15,7 +15,7 @@ function chart(style_name) {
     }
 
 
-    this.MARGIN = {top: 80, right: 50, bottom: 50, left: 70};
+    this.MARGIN = {top: 80, right: 50, bottom: 50, left: 90};
     this.WIDTH = this.style.width - this.MARGIN.left - this.MARGIN.right;
     this.HEIGHT = this.style.height - this.MARGIN.top - this.MARGIN.bottom;
 
