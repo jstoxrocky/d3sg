@@ -256,10 +256,11 @@ function chart(style_name) {
 
     this._mouseover_node = function(node, d, label, color) {
 
+        day_of_week_map = {0:'Sunday', 1:'Monday', 2:'Tuesday', 3:'Wednesday', 4:'Thursday', 5:'Friday', 6:'Saturday'}
         y_rounded = Math.round(d.y * 100) / 100;
         delta_rounded = Math.round(d.delta * 100) / 100;
         if (delta_rounded >= 0) {wow_color = "#458B00"} else {wow_color = "#CD2626"}
-        x_date = format_date(d.x)
+        x_date = format_date(d.x) + " (" + day_of_week_map[d.x.getDay()] + ")";
         text_to_display = y_rounded
 
 
@@ -383,7 +384,9 @@ function chart(style_name) {
         this._create_data_for_d3(x, y, underscore_label, label);
         // Line
         this.DATA.forEach(function(d) {
+            // console.log(d.x)
             d.x = parseDate(d.x)
+            // console.log(d.x)
         });
         x_scale = d3.time.scale().range([0, this.WIDTH]); // Line
         this._scale_data(underscore_label);
