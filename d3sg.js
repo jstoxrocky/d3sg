@@ -1,7 +1,7 @@
 function chart(style_name) {
 
-    ipython_style = {width:1000, height:400, name:'ipython'}
-    dash_style = {width:800, height:400, name:'dash'}
+    ipython_style = {width:1000, height:400, name:'ipython', bg_color:'#ffffff'}
+    dash_style = {width:800, height:400, name:'dash', bg_color:'#f5f5f5'}
 
 
     if (style_name == undefined) {
@@ -52,7 +52,7 @@ function chart(style_name) {
         this.svg.append("rect")
             .attr("width", "100%")
             .attr("height", "100%")
-            .attr("fill", "#f5f5f5");
+            .attr("fill", this.style.bg_color);
 
         this.g = this.svg.append("g")
             .attr("transform", "translate(" + this.MARGIN.left + "," + this.MARGIN.top + ")");
