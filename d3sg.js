@@ -1,6 +1,3 @@
-$('head').append($('<script type="text/javascript" />').attr('src', 'https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.js'));
-$('head').append($('<link rel="stylesheet" type="text/css" />').attr('href', 'https://rawgit.com/jstoxrocky/d3sg/master/d3sg_style.css'));
-
 function chart(style_name) {
 
     ipython_style = {width:1000, height:400, name:'ipython'}
