@@ -10,6 +10,7 @@ $(document).ready(function(){
 	ch.set_title("Three and Six Month T-Bill Prices");
 	ch.set_subtitle("The price of the three and six month T-Bills appear to follow a random walk.");
 	ch.set_ylabel("(USD)");
+	ch.set_xlabel("(Registration Date)");
 	$('#ch1').append(ch.svg.node())
 
 });

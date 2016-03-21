@@ -59,3 +59,42 @@ path {
 	font: 12px Arial;
 	color:#8C8C8C;
 }
+
+
+input[type="text"]
+{
+    font-family:sans-serif;
+    border: none;
+    background: transparent;
+}
+
+.horizontal_inputs {
+	width:600px;
+}
+
+::-webkit-input-placeholder
+{
+	/*color:black;*/
+}
+
+#title_input
+{
+    font-weight:bold;
+    font-size:18px;
+}
+
+#subtitle_input
+{
+	font-size:14px;
+}
+
+#ylabel_input {
+	text-align: center;
+	font-size: 12px
+}
+
+#xlabel_input {
+	text-align: center;
+	font-size: 12px;
+	width:300px;
+}
