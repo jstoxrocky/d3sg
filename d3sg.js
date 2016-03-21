@@ -562,7 +562,7 @@ function chart(style_name) {
                 .attr("class", "externalObject")
                 .attr("y", (this.HEIGHT + 25))
                 .attr("x", (this.WIDTH - 305 - 300))
-                .html("<input type='text' id='xlabel_input' placeholder='ch.set_xlabel(My Label)'></input>");
+                .html("<input type='text' id='xlabel_input' placeholder='Click to add label'></input>");
         }
         else {
             this.svg.append("text")
