@@ -1,16 +1,16 @@
-function get_d3() {
-  // Hacky
-  var strReturn;
-  var url = 'http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js';
-  jQuery.ajax({
-    url: url,
-    success: function(d3) {
-      strReturn = d3;
-    },
-    async:false
-  });
-  return d3;
-}
+// function get_d3() {
+//   // Hacky
+//   var strReturn;
+//   var url = 'http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js';
+//   jQuery.ajax({
+//     url: url,
+//     success: function(d3) {
+//       strReturn = d3;
+//     },
+//     async:false
+//   });
+//   return d3;
+// }
 
 
 
