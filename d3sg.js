@@ -1,4 +1,25 @@
+function get_d3() {
+  // Hacky
+  var strReturn;
+  var url = 'http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js';
+  jQuery.ajax({
+    url: url,
+    success: function(d3) {
+      strReturn = d3;
+    },
+    async:false
+  });
+  return d3;
+}
+
+
+
+
+
 function chart(style_name) {
+
+
+    d3 = get_d3();
 
     ipython_style = {width:1000, height:400, name:'ipython', bg_color:'#f5f5f5'}
     dash_style = {width:800, height:400, name:'dash', bg_color:'#f5f5f5'}
