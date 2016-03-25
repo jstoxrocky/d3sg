@@ -1,21 +1,3 @@
-// function get_d3() {
-//   // Hacky
-//   var strReturn;
-//   var url = 'http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.8/d3.min.js';
-//   jQuery.ajax({
-//     url: url,
-//     success: function(d3) {
-//       strReturn = d3;
-//     },
-//     async:false
-//   });
-//   return d3;
-// }
-
-
-
-
-
 function chart(style_name) {
 
 
@@ -78,7 +60,7 @@ function chart(style_name) {
     }
 
 
-    this._create_data_for_d3 = function (x, y, underscore_label, label) {
+    this._create_data_for_d3 = function (x, y, underscore_label, label, alpha) {
 
         var pct_chng = []
         $.each(y, function( index, value ) {
@@ -111,7 +93,7 @@ function chart(style_name) {
         // in the this.line and this.bar chart methods
         y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
 
-        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA}
+        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":alpha}
 
     }
 
@@ -179,6 +161,7 @@ function chart(style_name) {
             current_g.append("path")
                 .attr("d", valueline(data_dict[index]["values"]))
                 .style("stroke",color_scheme[line_num]["color"])
+                .style("opacity", data_dict[index]["alpha"])
                 .style("stroke-width", 2)
                 .attr("id",index)
                 .attr("class","line")
@@ -241,6 +224,7 @@ function chart(style_name) {
               .attr('cy', function(d) {return y_scale(d.y);})
               .attr('r', 3)
               .style("fill", data_dict[index]["color"])
+              .style("opacity", data_dict[index]["alpha"])
               .on("mouseover", function(d) {_mouseover_node(d3.select(this), d, data_dict[index]["label"], data_dict[index]["color"]);})
               .on("mousemove", function() {_mousemove_node(d3.select(this))})
               .on("mouseout", function() {_mouseout_node(d3.select(this))});
@@ -283,7 +267,7 @@ function chart(style_name) {
         text_to_display = y_rounded
 
 
-        node.transition().attr("r", 6).style("opacity", 1);
+        node.transition().attr("r", 6)
 
         tooltip
             .style("visibility", "visible");
@@ -394,13 +378,14 @@ function chart(style_name) {
     }
 
 
-    this.line = function(x, y, label) {
+    this.line = function(x, y, label, alpha) {
 
         var underscore_label = 'series_' + this.LINE_NUM;
         if (label == undefined) {label = underscore_label};
+        if (alpha == undefined) {alpha = 1};
         this.LABEL_DICT[label] = underscore_label;
 
-        this._create_data_for_d3(x, y, underscore_label, label);
+        this._create_data_for_d3(x, y, underscore_label, label, alpha);
         // Line
         this.DATA.forEach(function(d) {
             // console.log(d.x)
