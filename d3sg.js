@@ -28,6 +28,7 @@ function chart(style_name) {
     this.LINE_DICT = {}
     this.LINE_NUM = 0
     this.LABEL_DICT = {}
+    this.label_colors = {}
 
 
     this._LOLLIPOP = [  {"color":"#5DA5DA","alpha":1,'linestyle':'-'},
@@ -60,8 +61,8 @@ function chart(style_name) {
     }
 
 
-    this._create_data_for_d3 = function (x, y, underscore_label, label, alpha) {
-
+    this._create_data_for_d3 = function (x, y, underscore_label, label, kwargs) {
+        var color_scheme = this._LOLLIPOP;
         var pct_chng = []
         $.each(y, function( index, value ) {
             try {
@@ -93,7 +94,14 @@ function chart(style_name) {
         // in the this.line and this.bar chart methods
         y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
 
-        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":alpha}
+        if (kwargs.color_from == undefined) {
+            var _color = color_scheme[this.LINE_NUM]["color"]
+        }
+        else {
+            var _color = this.DATA_DICT[kwargs.color_from]["color"]
+        }
+
+        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":kwargs.alpha, "color":_color}
 
     }
 
@@ -129,7 +137,7 @@ function chart(style_name) {
     }
 
 
-    this._draw_line = function(underscore_label) {
+    this._draw_line = function(underscore_label, label) {
 
 
         this.g.selectAll("path").remove();
@@ -150,7 +158,7 @@ function chart(style_name) {
         $.each(data_dict, function( index, value ) {
 
             // Have colors loop
-            line_num = line_num % 8;
+            line_num = line_num % 9;
 
             var valueline = d3.svg.line()
                 .x( function(d) { return x_scale(d.x); })
@@ -160,7 +168,7 @@ function chart(style_name) {
 
             current_g.append("path")
                 .attr("d", valueline(data_dict[index]["values"]))
-                .style("stroke",color_scheme[line_num]["color"])
+                .style("stroke",data_dict[index]["color"])
                 .style("opacity", data_dict[index]["alpha"])
                 .style("stroke-width", 2)
                 .attr("id",index)
@@ -168,32 +176,9 @@ function chart(style_name) {
                 .on("mouseover", function() {d3.select(this).transition().style("stroke-width", 4);})
                 .on("mouseout", function() {d3.select(this).transition().style("stroke-width", 2);});
 
-            data_dict[index]["color"] = color_scheme[line_num]["color"]
             _draw_nodes(parent_this, index, line_num)
             line_num = line_num + 1
 
-
-
-
-
-
-
-            // show_node = function(parent_this) {
-            //  var x0 = x_scale.invert(d3.mouse(parent_this)[0]); 
-            //  console.log(x0)
-            // }
-
-            //--------------------
-            // svg.append("rect")
-            //  .data(data_dict[index]["values"])
-            //     .attr("width", width)
-            //     .attr("height", height)
-            //     .attr("class",'joey')
-            //     .style("fill", "none")
-            //     .style("pointer-events", "all")
-            //     .on("mousemove", function() {show_node(this)});
-
-            // ------------------
 
 
         });
@@ -378,26 +363,27 @@ function chart(style_name) {
     }
 
 
-    this.line = function(x, y, label, alpha) {
+    this.line = function(x, y, label, kwargs) {
 
-        var underscore_label = 'series_' + this.LINE_NUM;
+        var underscore_label = label//'series_' + this.LINE_NUM;
+
         if (label == undefined) {label = underscore_label};
-        if (alpha == undefined) {alpha = 1};
+        if (kwargs == undefined) {kwargs = {alpha:1, add_legend:true}};
+
+        var color_scheme = this._LOLLIPOP;
         this.LABEL_DICT[label] = underscore_label;
 
-        this._create_data_for_d3(x, y, underscore_label, label, alpha);
+
+
+        this._create_data_for_d3(x, y, underscore_label, label, kwargs);
         // Line
-        this.DATA.forEach(function(d) {
-            // console.log(d.x)
-            d.x = parseDate(d.x)
-            // console.log(d.x)
-        });
+        this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
         x_scale = d3.time.scale().range([0, this.WIDTH]); // Line
         this._scale_data(underscore_label);
         this._add_grid_lines();
-        this._draw_line(underscore_label);
+        this._draw_line(underscore_label, label);
         this._add_axes();
-        this._add_legend(label);
+        if (kwargs.add_legend) {this._add_legend(label)}
         this.LINE_NUM = this.LINE_NUM + 1;
 
     }
@@ -632,9 +618,10 @@ function chart(style_name) {
 
     this._add_legend = function(label) {
 
+        var line_num = this.LINE_NUM % 8;
 
         this.svg.append("text")
-            .attr("y", this.LINE_NUM*15 + this.MARGIN.top) // adding goes down
+            .attr("y", line_num*15 + this.MARGIN.top) // adding goes down
             .attr("x", 30 + 1.5*this.MARGIN.left) // minus goes down 
             .attr("dy", "0.3em")
             .style("text-anchor", "left")
@@ -644,10 +631,10 @@ function chart(style_name) {
         this.svg.append("line")
             .attr("x1", 0 + 1.5*this.MARGIN.left) // minus goes down 
             .attr("x2", 25 + 1.5*this.MARGIN.left) // minus goes down 
-            .attr("y1", this.LINE_NUM*15 + this.MARGIN.top) // adding goes down
-            .attr("y2", this.LINE_NUM*15 + this.MARGIN.top)
+            .attr("y1", line_num*15 + this.MARGIN.top) // adding goes down
+            .attr("y2", line_num*15 + this.MARGIN.top)
             .attr("stroke-width", 2)
-            .attr("stroke", this._LOLLIPOP[this.LINE_NUM]["color"]); // adding goes down
+            .attr("stroke", this._LOLLIPOP[line_num]["color"]); // adding goes down
 
 
     }
@@ -660,7 +647,7 @@ function chart(style_name) {
     this._add_default_subtitle();
     this._add_default_ylabel();
     this._add_default_xlabel();
-    this._add_legend();
+
 
 
 
