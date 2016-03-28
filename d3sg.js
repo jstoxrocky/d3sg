@@ -94,14 +94,14 @@ function chart(style_name) {
         // in the this.line and this.bar chart methods
         y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
 
-        if (kwargs.color_from == undefined) {
+        if (kwargs['color_from'] == undefined) {
             var _color = color_scheme[this.LINE_NUM]["color"]
         }
         else {
-            var _color = this.DATA_DICT[kwargs.color_from]["color"]
+            var _color = this.DATA_DICT[kwargs['color_from']]["color"]
         }
 
-        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":kwargs.alpha, "color":_color}
+        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color}
 
     }
 
@@ -368,7 +368,7 @@ function chart(style_name) {
         var underscore_label = label//'series_' + this.LINE_NUM;
 
         if (label == undefined) {label = underscore_label};
-        if (kwargs == undefined) {kwargs = {alpha:1, add_legend:true}};
+        if (kwargs == undefined) {kwargs = {'alpha':1, 'add_legend':true}};
 
         var color_scheme = this._LOLLIPOP;
         this.LABEL_DICT[label] = underscore_label;
@@ -383,7 +383,7 @@ function chart(style_name) {
         this._add_grid_lines();
         this._draw_line(underscore_label, label);
         this._add_axes();
-        if (kwargs.add_legend) {this._add_legend(label)}
+        if (kwargs['add_legend']) {this._add_legend(label)}
         this.LINE_NUM = this.LINE_NUM + 1;
 
     }
