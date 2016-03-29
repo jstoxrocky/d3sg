@@ -27,6 +27,7 @@ function chart(style_name) {
     this.DATA_DICT = {}
     this.LINE_DICT = {}
     this.LINE_NUM = 0
+    this.LEGEND_NUM = 0
     this.LABEL_DICT = {}
     this.label_colors = {}
 
@@ -131,7 +132,8 @@ function chart(style_name) {
 
         var current_data = this.DATA_DICT[underscore_label]["values"]
         x_scale.domain(d3.extent(current_data, function(d) { return d.x; }));
-        y_scale.domain([curr_min - 0.1*delta, curr_max + 0.1*delta*this.LINE_NUM]);
+        // change this to legend num
+        y_scale.domain([curr_min - 0.1*delta, curr_max + 0.1*delta*this.LEGEND_NUM]);
 
 
     }
@@ -383,7 +385,7 @@ function chart(style_name) {
         this._add_grid_lines();
         this._draw_line(underscore_label, label);
         this._add_axes();
-        if (kwargs['add_legend']) {this._add_legend(label)}
+        if (kwargs['add_legend']) {this._add_legend(label); this.LEGEND_NUM = this.LEGEND_NUM+1;}
         this.LINE_NUM = this.LINE_NUM + 1;
 
     }
