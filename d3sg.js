@@ -372,7 +372,11 @@ function chart(style_name) {
         var underscore_label = label//'series_' + this.LINE_NUM;
 
         if (label == undefined) {label = underscore_label};
-        if (kwargs == undefined) {kwargs = {'alpha':1, 'add_legend':true}};
+        if (kwargs == undefined) {
+            kwargs = {}
+            kwargs['alpha']=1;
+            kwargs['add_legend']=true;
+        };
 
         var color_scheme = this._LOLLIPOP;
         this.LABEL_DICT[label] = underscore_label;
@@ -387,7 +391,7 @@ function chart(style_name) {
         this._add_grid_lines();
         this._draw_line(underscore_label, label);
         this._add_axes();
-        if (kwargs['add_legend']) {this._add_legend(label); this.LEGEND_NUM = this.LEGEND_NUM+1;}
+        if (kwargs['add_legend']) {this._add_legend(label);}
         this.LINE_NUM = this.LINE_NUM + 1;
 
     }
@@ -623,9 +627,10 @@ function chart(style_name) {
     this._add_legend = function(label) {
 
         var line_num = this.LINE_NUM % 9;
+        this.LEGEND_NUM = this.LEGEND_NUM+1
 
         this.svg.append("text")
-            .attr("y", line_num*15 + this.MARGIN.top) // adding goes down
+            .attr("y", this.LEGEND_NUM*15 + this.MARGIN.top) // adding goes down
             .attr("x", 30 + 1.5*this.MARGIN.left) // minus goes down 
             .attr("dy", "0.3em")
             .style("text-anchor", "left")
@@ -635,8 +640,8 @@ function chart(style_name) {
         this.svg.append("line")
             .attr("x1", 0 + 1.5*this.MARGIN.left) // minus goes down 
             .attr("x2", 25 + 1.5*this.MARGIN.left) // minus goes down 
-            .attr("y1", line_num*15 + this.MARGIN.top) // adding goes down
-            .attr("y2", line_num*15 + this.MARGIN.top)
+            .attr("y1", this.LEGEND_NUM*15 + this.MARGIN.top) // adding goes down
+            .attr("y2", this.LEGEND_NUM*15 + this.MARGIN.top)
             .attr("stroke-width", 2)
             .attr("stroke", this._LOLLIPOP[line_num]["color"]); // adding goes down
 
