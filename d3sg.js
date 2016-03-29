@@ -95,8 +95,10 @@ function chart(style_name) {
         // in the this.line and this.bar chart methods
         y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
 
+        color_num = this.LINE_NUM % 9;
+
         if (kwargs['color_from'] == undefined) {
-            var _color = color_scheme[this.LINE_NUM]["color"]
+            var _color = color_scheme[color_num]["color"]
         }
         else {
             var _color = this.DATA_DICT[kwargs['color_from']]["color"]
@@ -620,7 +622,7 @@ function chart(style_name) {
 
     this._add_legend = function(label) {
 
-        var line_num = this.LINE_NUM % 8;
+        var line_num = this.LINE_NUM % 9;
 
         this.svg.append("text")
             .attr("y", line_num*15 + this.MARGIN.top) // adding goes down
