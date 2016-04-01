@@ -391,7 +391,11 @@ function chart(style_name) {
         this._add_grid_lines();
         this._draw_line(underscore_label, label);
         this._add_axes();
-        if (kwargs['add_legend']) {this._add_legend(label);}
+
+
+
+        var currline_color = this.DATA_DICT[underscore_label]['color'];
+        if (kwargs['add_legend']) {this._add_legend(label, currline_color);}
         if (kwargs['color_from'] == undefined) {this.LINE_NUM = this.LINE_NUM + 1;}
         
 
@@ -625,9 +629,10 @@ function chart(style_name) {
     }
 
 
-    this._add_legend = function(label) {
+    this._add_legend = function(label, currline_color) {
 
         var line_num = this.LINE_NUM % 9;
+        var currline_color = currline_color;
         
         this.svg.append("text")
             .attr("y", this.LEGEND_NUM*15 + this.MARGIN.top) // adding goes down
@@ -643,7 +648,7 @@ function chart(style_name) {
             .attr("y1", this.LEGEND_NUM*15 + this.MARGIN.top) // adding goes down
             .attr("y2", this.LEGEND_NUM*15 + this.MARGIN.top)
             .attr("stroke-width", 2)
-            .attr("stroke", this._LOLLIPOP[line_num]["color"]); // adding goes down
+            .attr("stroke", currline_color); // adding goes down
         this.LEGEND_NUM = this.LEGEND_NUM+1
 
     }
