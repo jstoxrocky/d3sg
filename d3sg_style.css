@@ -72,7 +72,7 @@ input[type="text"]
 	width:600px;
 }
 
-input[type="text"] .chart_input {
+svg .chart .chart_input {
 	box-shadow: none;
 }
 
