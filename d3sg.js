@@ -1,4 +1,4 @@
-function chart(style_name) {
+function chart(style_name, gif) {
 
 
     ipython_style = {width:1000, height:400, name:'ipython', bg_color:'#f5f5f5'}
@@ -30,6 +30,7 @@ function chart(style_name) {
     this.LEGEND_NUM = 0
     this.LABEL_DICT = {}
     this.label_colors = {}
+    this.gif = gif;
 
 
     this._LOLLIPOP = [  {"color":"#5DA5DA","alpha":1,'linestyle':'-'},
@@ -52,13 +53,47 @@ function chart(style_name) {
             .attr("height", this.HEIGHT + this.MARGIN.top + this.MARGIN.bottom)
             .attr("class","chart");
 
-        this.svg.append("rect")
-            .attr("width", "100%")
-            .attr("height", "100%")
-            .attr("fill", this.style.bg_color);
+
+        if (this.gif == undefined) {
+
+            this.svg.append("rect")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("fill", this.style.bg_color);
+
+        }
+        else {
+
+            this.svg.append("defs")
+              .append("pattern")
+                   .attr("id", "image")
+                   .attr('x',"0")
+                   .attr('y',"0")
+                   .attr('height',"100%")
+                   .attr('width',"100%")
+                        .append("image")
+                      .attr('x',"0")
+                        .attr('y',"0")
+                        .attr('height',"100%")
+                      .attr('width',"100%")
+                        .attr("xlink:href", this.gif);
+
+            this.svg.append("rect")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                 .style("fill", "url(#image)");
+
+            this.svg.append("rect")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("fill", this.style.bg_color)
+                .style("opacity", 0.7);
+
+        }
 
         this.g = this.svg.append("g")
-            .attr("transform", "translate(" + this.MARGIN.left + "," + this.MARGIN.top + ")");
+                .attr("transform", "translate(" + this.MARGIN.left + "," + this.MARGIN.top + ")");
+
     }
 
 
