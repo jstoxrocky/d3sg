@@ -451,6 +451,7 @@ function chart(style_name) {
              .attr("font-family","sans-serif")
              .style("font-size", "18px")
              .style("font-weight", "bold")
+             .style("box-shadow", "none")
              .text(title);
         }
     }
