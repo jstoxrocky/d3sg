@@ -72,11 +72,10 @@ input[type="text"]
 	width:600px;
 }
 
-input .chart_input {
+input[type="text"] .chart_input {
 	box-shadow: none;
 }
 
-.horizontal_inputs {box-shadow: none;}
 
 ::-webkit-input-placeholder
 {
