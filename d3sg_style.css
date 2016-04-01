@@ -72,7 +72,7 @@ input[type="text"]
 	width:600px;
 }
 
-.chart_input {
+input .chart_input {
 	box-shadow: none;
 }
 
