@@ -70,6 +70,7 @@ input[type="text"]
 
 .horizontal_inputs {
 	width:600px;
+	box-shadow: none;
 }
 
 ::-webkit-input-placeholder
