@@ -468,7 +468,7 @@ function chart(style_name) {
                 .attr("class", "externalObject ")
                 .attr("x", 0)
                 .attr("y", 0 - (this.MARGIN.top)/2.3)
-                .html("<input type='text' id='subtitle_input' placeholder='Click to add chart subtitle.' class='horizontal_inputs chart_input'></input>");
+                .html("<input type='text' id='subtitle_input' placeholder='Click to add chart subtitle.' class='horizontal_inputs chart_input' style='box-shadow:none;'></input>");
         }
         else {
             var subtitle = "ch.set_subtitle('This is my default subtitle')"
