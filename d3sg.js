@@ -440,7 +440,7 @@ function chart(style_name) {
                 .attr("class", "externalObject")
                 .attr("x", 0)
                 .attr("y", 0 - (this.MARGIN.top)/1.4)
-                .html("<input type='text' id='title_input' placeholder='Click to Add a Chart Title.' class='horizontal_inputs'></input>");
+                .html("<input type='text' id='title_input' placeholder='Click to Add a Chart Title.' class='horizontal_inputs chart_input'></input>");
         }
         else {
         var title = "ch.set_title('My Title')"
@@ -451,7 +451,6 @@ function chart(style_name) {
              .attr("font-family","sans-serif")
              .style("font-size", "18px")
              .style("font-weight", "bold")
-             .style("box-shadow", "none")
              .text(title);
         }
     }
@@ -469,7 +468,7 @@ function chart(style_name) {
                 .attr("class", "externalObject ")
                 .attr("x", 0)
                 .attr("y", 0 - (this.MARGIN.top)/2.3)
-                .html("<input type='text' id='subtitle_input' placeholder='Click to add chart subtitle.' class='horizontal_inputs'></input>");
+                .html("<input type='text' id='subtitle_input' placeholder='Click to add chart subtitle.' class='horizontal_inputs chart_input'></input>");
         }
         else {
             var subtitle = "ch.set_subtitle('This is my default subtitle')"
@@ -535,7 +534,7 @@ function chart(style_name) {
                 .attr("class", "externalObject")
                 .attr("y", 0 - this.MARGIN.left/1.3) // minus goes left
                 .attr("x", 0 - ((this.MARGIN.top + this.MARGIN.bottom + this.HEIGHT)/2.2)) // minus goes down 
-                .html("<input type='text' id='ylabel_input' placeholder='Click to add label'></input>")
+                .html("<input type='text' id='ylabel_input' placeholder='Click to add label' class='chart_input'></input>")
                 .attr("transform", "rotate(-90)");
         }
         else {
@@ -565,7 +564,7 @@ function chart(style_name) {
                 .attr("class", "externalObject")
                 .attr("y", (this.HEIGHT + 25))
                 .attr("x", (this.WIDTH - 305 - 300))
-                .html("<input type='text' id='xlabel_input' placeholder='Click to add label'></input>");
+                .html("<input type='text' id='xlabel_input' placeholder='Click to add label' class='chart_input'></input>");
         }
         else {
             this.svg.append("text")

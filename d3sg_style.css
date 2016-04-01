@@ -70,8 +70,13 @@ input[type="text"]
 
 .horizontal_inputs {
 	width:600px;
+}
+
+.chart_input {
 	box-shadow: none;
 }
+
+.horizontal_inputs {box-shadow: none;}
 
 ::-webkit-input-placeholder
 {
