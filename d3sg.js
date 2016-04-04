@@ -139,41 +139,47 @@ function chart(style_name, gif) {
             var _color = this.DATA_DICT[kwargs['color_from']]["color"]
         }
 
-        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color}
-
+        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color, }
+        if (kwargs['url'] != undefined) {this.DATA_DICT[underscore_label]['url'] = kwargs['url']};
     }
 
 
-    this._scale_data = function(underscore_label) {
 
+
+    this._scale_numerical_y_data = function(underscore_label) {
         var data_dict = this.DATA_DICT
-
-        // console.log(data_dict)
-        
-        var curr_max = -1000000;
-        var curr_min = 1000000;
+        var y_curr_max = -1000000;
+        var y_curr_min = 1000000;
         $.each(data_dict, function( index, value ) {
-            
-            var new_max = d3.max(data_dict[index]["values"], function(d) { return d.y; })
-            var new_min = d3.min(data_dict[index]["values"], function(d) { return d.y; })
-
-            if (new_max >= curr_max) {
-                curr_max = new_max;
-            }
-            if (new_min < curr_min) {
-                curr_min = new_min;
-            }
+            var y_new_max = d3.max(data_dict[index]["values"], function(d) { return d.y; })
+            var y_new_min = d3.min(data_dict[index]["values"], function(d) { return d.y; })
+            if (y_new_max >= y_curr_max) {y_curr_max = y_new_max;}
+            if (y_new_min < y_curr_min) {y_curr_min = y_new_min;}
         });
 
-        delta = curr_max - curr_min
+        delta = y_curr_max - y_curr_min
+        y_scale.domain([y_curr_min - 0.1*delta, y_curr_max + 0.1*delta*this.LEGEND_NUM]);
+    }
 
+    this._scale_numerical_x_data = function(underscore_label) {
+        var data_dict = this.DATA_DICT
+        var x_curr_max = -1000000;
+        var x_curr_min = 1000000;
+        $.each(data_dict, function( index, value ) {
+            var x_new_max = d3.max(data_dict[index]["values"], function(d) { return d.x; })
+            var x_new_min = d3.min(data_dict[index]["values"], function(d) { return d.x; })
+            if (x_new_max >= x_curr_max) {x_curr_max = x_new_max;}
+            if (x_new_min < x_curr_min) {x_curr_min = x_new_min;}
+        });
+        x_scale.domain([x_curr_min, x_curr_max]);
+    }
+
+    this._scale_date_x_data = function(underscore_label) {
         var current_data = this.DATA_DICT[underscore_label]["values"]
         x_scale.domain(d3.extent(current_data, function(d) { return d.x; }));
-        // change this to legend num
-        y_scale.domain([curr_min - 0.1*delta, curr_max + 0.1*delta*this.LEGEND_NUM]);
-
-
     }
+
+
 
 
     this._draw_line = function(underscore_label, label) {
@@ -365,24 +371,93 @@ function chart(style_name, gif) {
     }
 
 
-    this._add_axes = function() {
+
+    this._draw_scatter = function(label, kwargs) {
 
 
-        this.svg.selectAll('g.axis').remove()
+        var current_g = this.g;
+        var line_num = 0;
+        var data_dict = this.DATA_DICT
+        var height = this.HEIGHT
+        var width = this.WIDTH
 
-        xAxis = d3.svg.axis().scale(x_scale)
-            .orient("bottom").ticks(10)
-            .tickFormat(format_date);;
-        yAxis = d3.svg.axis().scale(y_scale)
+        current_g.selectAll("circle").remove();
+        current_g.selectAll("defs").remove();
+
+        $.each(data_dict, function( index, value ) {
+
+        var r = kwargs['size'];
+        var gif_x = r - 800*0.1*0.5
+        var gif_y = r - 400*0.1*0.5
+
+            current_g.selectAll("defs.scatter_defs")
+              .data(data_dict[index]["values"])
+            .enter().append("defs")
+              .append("pattern")
+                   .attr("id", data_dict[index]['url'])
+                   .attr('x',"0")
+                   .attr('y',"0")
+                   .attr('height',"100%")
+                   .attr('width',"100%")
+                        .append("image")
+                        .attr('x',gif_x) // loc of gif
+                        .attr('y',gif_y) // loc of gif
+                        .attr('height',"10%") // height of gif
+                        .attr('width',"10%") // width of gif
+                        .attr("xlink:href", data_dict[index]['url'])
+
+              c = current_g.selectAll("circle.scatters")
+                  .data(data_dict[index]["values"])
+                    .enter().append("circle")
+                      .attr("cx", function(d) { return x_scale(d.x)})
+                      .attr("cy", function(d) { return y_scale(d.y)})
+                      .attr("r", r.toString())
+                      .style("fill", function(d) { return "url(#"+data_dict[index]['url']+")"});
+
+            line_num = line_num + 1
+
+        });
+        
+    }
+
+
+
+
+
+
+
+
+
+
+    this._add_numeric_y_axis = function() {
+        this.svg.selectAll('g.y.axis').remove()
+        y_axis = d3.svg.axis().scale(y_scale)
             .orient("left").ticks(7);
+        this.g.append("g") // Add the Y Axis
+            .attr("class", "y axis")
+            .call(y_axis);
+    }
 
-        var dateTicks = this.g.append("g") // Add the X Axis
-            .attr("class", "axis")
+    this._add_numeric_x_axis = function() {
+        this.svg.selectAll('g.x.axis').remove()
+        x_axis = d3.svg.axis().scale(x_scale)
+            .orient("bottom").ticks(10);
+        this.g.append("g") // Add the Y Axis
+            .attr("class", "x axis")
             .attr("transform", "translate(0," + this.HEIGHT + ")")
-            .call(xAxis)
+            .call(x_axis);
+    }
+
+    this._add_date_x_axis = function() {
+        this.svg.selectAll('g.x.axis').remove();
+        x_axis = d3.svg.axis().scale(x_scale)
+            .orient("bottom").ticks(10)
+            .tickFormat(format_date);
+        var dateTicks = this.g.append("g") // Add the X Axis
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + this.HEIGHT + ")")
+            .call(x_axis)
             .selectAll('.tick');
-
-
         // Hacky solution
         // Edit the number 2 int he future to be more responsive
         for (var j = 0; j < dateTicks[0].length; j++) {
@@ -391,15 +466,12 @@ function chart(style_name, gif) {
                 d3.select(c).remove();
             }
         }
-
-
-
-
-
-        this.g.append("g") // Add the Y Axis
-            .attr("class", "axis")
-            .call(yAxis);
     }
+
+
+
+
+
 
 
     this.line = function(x, y, label, kwargs) {
@@ -422,10 +494,14 @@ function chart(style_name, gif) {
         // Line
         this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
         x_scale = d3.time.scale().range([0, this.WIDTH]); // Line
-        this._scale_data(underscore_label);
+        this._scale_numerical_y_data(underscore_label)
+        this._scale_date_x_data(underscore_label)
+
         this._add_grid_lines();
         this._draw_line(underscore_label, label);
-        this._add_axes();
+        // this._add_axes();
+        this._add_numeric_y_axis();
+        this._add_date_x_axis();
 
 
 
@@ -466,6 +542,40 @@ function chart(style_name, gif) {
         this._add_axes();
         this._add_legend(label);
         this.LINE_NUM = this.LINE_NUM + 1;
+
+    }
+
+
+    this.scatter = function(x, y, label, kwargs) {
+
+
+        var underscore_label = label//'series_' + this.LINE_NUM;
+
+        if (label == undefined) {label = underscore_label};
+        if (kwargs == undefined) {
+            kwargs = {}
+            kwargs['alpha']=1;
+            kwargs['add_legend']=true;
+            kwargs['size'] = 10
+        };
+
+
+        var color_scheme = this._LOLLIPOP;
+        this.LABEL_DICT[label] = underscore_label;
+
+        this._create_data_for_d3(x, y, underscore_label, label, kwargs);
+        // Line
+        x_scale = d3.scale.linear().range([0, this.WIDTH]);
+        this._scale_numerical_y_data(underscore_label)
+        this._scale_numerical_x_data(underscore_label)
+        this._add_grid_lines();
+        this._draw_scatter(label, kwargs);
+        this._add_numeric_y_axis();
+        this._add_numeric_x_axis();
+
+        var currline_color = this.DATA_DICT[underscore_label]['color'];
+        if (kwargs['add_legend']) {this._add_legend(label, currline_color);}
+        if (kwargs['color_from'] == undefined) {this.LINE_NUM = this.LINE_NUM + 1;}
 
     }
 
@@ -656,10 +766,10 @@ function chart(style_name, gif) {
                 .attr("d", valueline(data));
             svg.select(".x.axis")
                 .duration(750)
-                .call(xAxis);
+                .call(x_axis);
             svg.select(".y.axis")
                 .duration(750)
-                .call(yAxis);
+                .call(y_axis);
 
     }
 

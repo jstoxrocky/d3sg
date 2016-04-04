@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>d3sg.js Bar Example</title>
+        <script src="https://codeorigin.jquery.com/jquery-2.0.3.min.js"></script> 
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.js"></script>
+        <link href="d3sg_style.css" type="text/css" rel="stylesheet">
+        <script src="d3sg.js"></script>
+    </head>
+    <body>
+    	<div id="ch1"></div>
+    </body>
+
+    <script>
+        ch = new chart("ipython");
+        ch.scatter([1,5,4], [4,3,3], '1 Month', {'size':20, 'url':"https://s-media-cache-ak0.pinimg.com/originals/a5/7c/7e/a57c7e202569bcc532cd4e87722624ed.gif"});
+        ch.scatter([4,2,3], [6,3,7], '2 Month', {'size':20, 'url':"http://imagesmtv-a.akamaihd.net/uri/mgid:file:http:shared:mtv.com/news/wp-content/uploads/2015/07/giphy-3-1435766188.gif"});
+        ch.scatter([1.4,4.2,6.3], [3.3,5.9,2.6], 'F Month', {'size':20, 'url':"https://media.giphy.com/media/zeccxaOfU2PWo/giphy.gif"});
+        $('#ch1').append(ch.svg.node())
+    </script>
+
+</html> 
