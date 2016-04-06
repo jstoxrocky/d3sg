@@ -484,6 +484,9 @@ function chart(style_name, gif) {
             kwargs['alpha']=1;
             kwargs['add_legend']=true;
         };
+        if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
+        if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
+
 
         var color_scheme = this._LOLLIPOP;
         this.LABEL_DICT[label] = underscore_label;
@@ -558,6 +561,9 @@ function chart(style_name, gif) {
             kwargs['add_legend']=true;
             kwargs['size'] = 10
         };
+        if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
+        if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = false;}
+        if (kwargs['size'] == undefined) {kwargs['size'] = 20;}
 
 
         var color_scheme = this._LOLLIPOP;
