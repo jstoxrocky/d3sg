@@ -21,7 +21,9 @@ function chart(style_name, gif) {
     this.HEIGHT = this.style.height - this.MARGIN.top - this.MARGIN.bottom;
 
     format_date = d3.time.format("%Y-%m-%d")
+    format_datetime = d3.time.format("%Y-%m-%d %H:%M:%S")
     parseDate = format_date.parse;
+    parseDatetime = format_datetime.parse;
     bisectDate = d3.bisector(function(d) { return d.date; }).left;
     this.DATA = []
     this.DATA_DICT = {}
@@ -495,7 +497,14 @@ function chart(style_name, gif) {
 
         this._create_data_for_d3(x, y, underscore_label, label, kwargs);
         // Line
-        this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
+        if (x[0].length > 10) {
+            this.DATA.forEach(function(d) {d.x = parseDatetime(d.x)});
+        }
+        else {
+            this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
+        }
+
+
         x_scale = d3.time.scale().range([0, this.WIDTH]); // Line
         this._scale_numerical_y_data(underscore_label)
         this._scale_date_x_data(underscore_label)
