@@ -132,6 +132,7 @@ function chart(style_name, gif) {
         // in the this.line and this.bar chart methods
         y_scale = d3.scale.linear().range([this.HEIGHT, 0]);
 
+
         color_num = this.LINE_NUM % 9;
 
         if (kwargs['color_from'] == undefined) {
@@ -160,7 +161,13 @@ function chart(style_name, gif) {
         });
 
         delta = y_curr_max - y_curr_min
-        y_scale.domain([y_curr_min - 0.1*delta, y_curr_max + 0.1*delta*this.LEGEND_NUM]);
+        
+        var thing_to_control_for_homogenous_data = 0
+        if (y_curr_min - 0.1*delta == y_curr_max + 0.1*delta*this.LEGEND_NUM) {
+            thing_to_control_for_homogenous_data = 0.1*y_curr_min // happens a lot with median data
+        }
+        y_scale.domain([y_curr_min - 0.1*delta - thing_to_control_for_homogenous_data, y_curr_max + 0.1*delta*this.LEGEND_NUM + thing_to_control_for_homogenous_data]);
+
     }
 
     this._scale_numerical_x_data = function(underscore_label) {
