@@ -2,6 +2,7 @@ function chart(style_name, gif) {
 
 
     ipython_style = {width:1000, height:400, name:'ipython', bg_color:'#f5f5f5'}
+    ipython_report_style = {width:1000, height:400, name:'ipython_report', bg_color:'#f5f5f5'}
     dash_style = {width:800, height:400, name:'dash', bg_color:'#f5f5f5'}
 
 
@@ -12,7 +13,7 @@ function chart(style_name, gif) {
         this.style = ipython_style
     }
     else if (style_name == 'ipython_report') {
-        this.style = ipython_style
+        this.style = ipython_report_style
     }
     else {
         this.style = dash_style
