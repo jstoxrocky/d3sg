@@ -15,14 +15,18 @@ $(document).ready(function(){
 
 	var ch = new chart('dash');
 	
-	ch.area(x, y, y_bottom, 'Confidence Interval', {'alpha':0.7});
-	// ch.line(x, y_point, 'Point Estimate');
+	// ch.area(x, y, y_bottom, 'Confidence Interval', {'alpha':0.7});
+	ch.line(x, y_point, 'Point Estimate');
+	ch.line(x, y_bottom, 'Point Estimate 2');
 
 
 	ch.set_title("Three and Six Month T-Bill Prices");
 	ch.set_subtitle("The price of the three and six month T-Bills appear to follow a random walk.");
 	ch.set_ylabel("(USD)");
 	ch.set_xlabel("(Registration Date)");
+	// ch.set_ymin(0);
+	// ch.set_ymax(180);
+	// ch.set_ylim(50, 180)
 	$('#ch1').append(ch.svg.node())
 
 });

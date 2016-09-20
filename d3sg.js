@@ -37,6 +37,9 @@ function chart(style_name, gif) {
     this.LABEL_DICT = {}
     this.label_colors = {}
     this.gif = gif;
+    this.setted_ymin
+    this.setted_ymax
+
 
 
     this._LOLLIPOP = [  {"color":"#5DA5DA","alpha":1,'linestyle':'-'},
@@ -181,9 +184,24 @@ function chart(style_name, gif) {
         if (y_curr_min - 0.1*delta == y_curr_max + 0.1*delta*this.LEGEND_NUM) {
             thing_to_control_for_homogenous_data = 0.1*y_curr_min // happens a lot with median data
         }
-        y_scale.domain([y_curr_min - 0.1*delta - thing_to_control_for_homogenous_data, y_curr_max + 0.1*delta*this.LEGEND_NUM + thing_to_control_for_homogenous_data]);
+
+        if (this.setted_ymin == undefined) {
+            ymin = y_curr_min - 0.1*delta - thing_to_control_for_homogenous_data;
+        } else {
+            ymin = this.setted_ymin
+        }
+        if (this.setted_ymax == undefined) {
+            ymax = y_curr_max + 0.1*delta*this.LEGEND_NUM + thing_to_control_for_homogenous_data;
+        } else {
+            ymax = this.setted_ymax
+        }
+
+        y_scale.domain([ymin, ymax]);
+
+        // y_scale.domain([0, 300]); // JOEY EDIT
 
     }
+
 
     this._scale_numerical_x_data = function(underscore_label) {
         var data_dict = this.DATA_DICT
@@ -274,7 +292,6 @@ function chart(style_name, gif) {
         parent_this = this
 
         this.g.selectAll('.node').remove()
-        // console.log(a)
         $.each(data_dict, function( index, value ) {
 
             // Have colors loop
@@ -506,6 +523,9 @@ function chart(style_name, gif) {
 
     this._add_numeric_y_axis = function() {
         this.svg.selectAll('g.y.axis').remove()
+
+        // y_scale.domain([0, 300]); // JOEY EDIT
+
         y_axis = d3.svg.axis().scale(y_scale)
             .orient("left").ticks(7);
         this.g.append("g") // Add the Y Axis
@@ -931,8 +951,58 @@ function chart(style_name, gif) {
     }
 
 
+    this.set_ymin = function(ymin) {
+        // CLear all data
+        this.g.selectAll("path").remove()
+        this.g.selectAll("circle").remove()
+
+        // Correct scaling
+        this.setted_ymin = ymin
+
+        // Add all data back with correct new scaling
+        this._scale_numerical_y_data()
+        this._add_grid_lines();
+        this._draw_line();
+        this._add_numeric_y_axis();
+        this._add_date_x_axis();
+
+    }
+
+    this.set_ymax = function(ymax) {
+        // CLear all data
+        this.g.selectAll("path").remove()
+        this.g.selectAll("circle").remove()
+
+        // Correct scaling
+        this.setted_ymax = ymax
+
+        // Add all data back with correct new scaling
+        this._scale_numerical_y_data()
+        this._add_grid_lines();
+        this._draw_line();
+        this._add_numeric_y_axis();
+        this._add_date_x_axis();
+
+    }
 
     
+    this.set_ylim = function(ymin, ymax) {
+        // CLear all data
+        this.g.selectAll("path").remove()
+        this.g.selectAll("circle").remove()
+
+        // Correct scaling
+        this.setted_ymax = ymax
+        this.setted_ymin = ymin
+
+        // Add all data back with correct new scaling
+        this._scale_numerical_y_data()
+        this._add_grid_lines();
+        this._draw_line();
+        this._add_numeric_y_axis();
+        this._add_date_x_axis();
+    }
+
     this._create_canvas();
     this._add_default_title();
     this._add_default_subtitle();
