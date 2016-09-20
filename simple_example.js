@@ -6,14 +6,19 @@ $(document).ready(function(){
 
 	// var x = ["2013-02-01", "2013-02-02", "2013-02-03"]
 	var x = ['2016-05-04 22:00:53', '2016-05-04 22:12:23', '2016-05-04 22:27:53']
-	var y1 = [200, 200, 201]
+	var y = [200, 190, 183]
+	var y_bottom = [100, 150, 179]
+	var y_point = [150, 170, 181]
 
 	// var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 	// console.log(parseDate('2016-05-04 22:00:53'))
 
 	var ch = new chart('dash');
-	ch.line(x, y1, 'One');
-	// ch.line(x, y2, 'Two');
+	
+	ch.area(x, y, y_bottom, 'Confidence Interval', {'alpha':0.7});
+	// ch.line(x, y_point, 'Point Estimate');
+
+
 	ch.set_title("Three and Six Month T-Bill Prices");
 	ch.set_subtitle("The price of the three and six month T-Bills appear to follow a random walk.");
 	ch.set_ylabel("(USD)");
