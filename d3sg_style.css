@@ -1,105 +1,97 @@
-.chart { 
+/*.chart { 
 	font: 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
+}*/
 
-path {
+/*path {
 	stroke-width: 2;
 	fill: none;
-}
+}*/
 
-.axis path,
-
-.axis line {
+/*.axis path, .axis line {
 	fill: none;
 	stroke: grey;
 	stroke-width: 1;
 	shape-rendering: crispEdges;
-}
+}*/
 
-.grid .tick {
+/*.grid .tick {
 	stroke: lightgrey;
 	opacity: 0.7;
-}
+}*/
 
-.grid path {
+/*.grid path {
 	stroke-width: 0;
 }
+*/
 
-
-.line {
+/*.line {
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
-}
+}*/
 
 
-.tick {
+/*.tick {
 	font: 12px Arial;
-}
+}*/
 
-#ylabel {
+/*#ylabel {
 	font: 12px Arial;
-}
+}*/
 
-.tip {
+/*.tip {
 	font: 16px Arial;
 	background-color:#f5f5f5;
 	border-style: solid;
     border-width: 1px;
     border-radius: 5px;
 	padding:5px;
-}
+}*/
 
-.tip_head {
+/*.tip_head {
 	font: 10px Arial;
 	color:#8C8C8C;
-}
+}*/
 
-.tip_mid {
+/*.tip_mid {
 	font: 12px Arial;
 	color:#8C8C8C;
-}
+}*/
 
 
-input[type="text"]
+/*input[type="text"]
 {
-    font-family:sans-serif;
-    border: none;
-    background: transparent;
-}
+    font-family:sans-serif;border: none;background: transparent;
+    
+    
+}*/
 
-.horizontal_inputs {
+/*.horizontal_inputs {
 	width:600px;
-}
+}*/
 
-svg .chart .chart_input {
+/*svg .chart .chart_input {
 	box-shadow: none;
-}
+}*/
 
-
-::-webkit-input-placeholder
-{
-	/*color:black;*/
-}
-
-#title_input
+/*#title_input
 {
     font-weight:bold;
     font-size:18px;
-}
+}*/
 
-#subtitle_input
+/*#subtitle_input
 {
 	font-size:14px;
-}
+}*/
 
-#ylabel_input {
+/*#ylabel_input {
 	text-align: center;
 	font-size: 12px
-}
+}*/
 
-#xlabel_input {
+/*#xlabel_input {
 	text-align: center;
 	font-size: 12px;
 	width:300px;
-}
+}*/

@@ -67,7 +67,7 @@ function chart(style_name, gif) {
         this.svg = d3.select(document.createElementNS(d3.ns.prefix.svg, 'svg'))
             .attr("width", this.WIDTH + this.MARGIN.left + this.MARGIN.right)
             .attr("height", this.HEIGHT + this.MARGIN.top + this.MARGIN.bottom)
-            .attr("class","chart");
+            .style("font", "12px 'Helvetica Neue', Helvetica, Arial, sans-serif");
 
 
         if (this.gif == undefined) {
@@ -288,6 +288,7 @@ function chart(style_name, gif) {
                 .style("stroke-width", 2)
                 .attr("id",index)
                 .attr("class","line")
+                // .attr("fill", "none")
                 .on("mouseover", function() {d3.select(this).transition().style("stroke-width", 4);})
                 .on("mouseout", function() {d3.select(this).transition().style("stroke-width", 2);});
 
@@ -339,6 +340,7 @@ function chart(style_name, gif) {
                 .style("stroke-width", 2)
                 .attr("id",index)
                 .attr("class","line")
+                .attr("fill", "none")
                 .on("mouseover", function() {d3.select(this).transition().style("stroke-width", 4);})
                 .on("mouseout", function() {d3.select(this).transition().style("stroke-width", 2);});
 
@@ -383,21 +385,30 @@ function chart(style_name, gif) {
 
         }
 
-
     var tooltip = d3.select("body")
         .append("div")
         .style("position", "absolute")
         .attr("class", "tip")
+        .style("font","16px Arial")
+        .style("background-color","#f5f5f5")
+        .style("border-style","solid")
+        .style("border-width","1px")
+        .style("border-radius","5px")
+        .style("padding","5px")
         .style("z-index", "10")
         .style("visibility", "hidden");
     
     var tip_head = tooltip
         .append("div")
-        .attr("class", "tip_head");
+        .attr("class", "tip_head")
+        .style("font", "10px Arial")
+        .style("color", "#8C8C8C");
 
     var tip_mid = tooltip
         .append("div")
-        .attr("class", "tip_mid");
+        .attr("class", "tip_mid")
+        .style("font", "12px Arial")
+        .style("color", "#8C8C8C");
 
     var tip_foot = tooltip
         .append("div")
@@ -522,24 +533,23 @@ function chart(style_name, gif) {
     this._add_numeric_y_axis = function() {
         this.svg.selectAll('g.y.axis').remove()
 
-        // y_scale.domain([0, 300]); // JOEY EDIT
-
         y_axis = d3.svg.axis().scale(y_scale)
             .orient("left").ticks(7);
+
         this.g.append("g") // Add the Y Axis
             .attr("class", "y axis")
-            .call(y_axis);
+            .call(y_axis)
+            .selectAll('.tick')
+            .style("font", "12px Arial");
+
+        this.g.selectAll('.axis line, .axis path')
+            .style("fill", "none")
+            .style("stroke", "grey")
+            .style("shape-rendering", "crispEdges")
+            .style("stroke-width", "1")
+
     }
 
-    // this._add_numeric_x_axis = function() {
-    //     this.svg.selectAll('g.x.axis').remove()
-    //     x_axis = d3.svg.axis().scale(x_scale)
-    //         .orient("bottom").ticks(10);
-    //     this.g.append("g") // Add the Y Axis
-    //         .attr("class", "x axis")
-    //         .attr("transform", "translate(0," + this.HEIGHT + ")")
-    //         .call(x_axis);
-    // }
 
     this._add_numeric_x_axis = function(labels) {
         
@@ -558,7 +568,15 @@ function chart(style_name, gif) {
         this.g.append("g") // Add the Y Axis
             .attr("class", "x axis")
             .attr("transform", "translate(0," + this.HEIGHT + ")")
-            .call(x_axis);
+            .call(x_axis)
+            .selectAll('.tick')
+            .style("font", "12px Arial");
+
+        this.g.selectAll('.axis line, .axis path')
+            .style("fill", "none")
+            .style("stroke", "grey")
+            .style("shape-rendering", "crispEdges")
+            .style("stroke-width", "1")
 
     }
 
@@ -572,7 +590,8 @@ function chart(style_name, gif) {
             .attr("class", "x axis")
             .attr("transform", "translate(0," + this.HEIGHT + ")")
             .call(x_axis)
-            .selectAll('.tick');
+            .selectAll('.tick')
+            .style("font", "12px Arial");
         // Hacky solution
         // Edit the number 2 int he future to be more responsive
         for (var j = 0; j < dateTicks[0].length; j++) {
@@ -581,6 +600,12 @@ function chart(style_name, gif) {
                 d3.select(c).remove();
             }
         }
+
+        this.g.selectAll('.axis line, .axis path')
+            .style("fill", "none")
+            .style("stroke", "grey")
+            .style("shape-rendering", "crispEdges")
+            .style("stroke-width", "1")
     }
 
 
@@ -900,7 +925,7 @@ function chart(style_name, gif) {
                 .attr("class", "externalObject")
                 .attr("x", 0)
                 .attr("y", 0 - (this.MARGIN.top)/1.4)
-                .html("<input type='text' id='title_input' placeholder='Click to Add a Chart Title.' class='horizontal_inputs chart_input' style='box-shadow:none;'></input>");
+                .html("<input type='text' id='title_input' placeholder='Click to Add a Chart Title.' class='horizontal_inputs chart_input' style='box-shadow:none;font-weight:bold;font-size:18px;width:600px;font-family:sans-serif;border: none;background: transparent;'></input>");
         }
         else {
         var title = "ch.set_title('My Title')"
@@ -928,7 +953,7 @@ function chart(style_name, gif) {
                 .attr("class", "externalObject ")
                 .attr("x", 0)
                 .attr("y", 0 - (this.MARGIN.top)/2.3)
-                .html("<input type='text' id='subtitle_input' placeholder='Click to add chart subtitle.' class='horizontal_inputs chart_input' style='box-shadow:none;'></input>");
+                .html("<input type='text' id='subtitle_input' placeholder='Click to add chart subtitle.' class='horizontal_inputs chart_input' style='box-shadow:none;font-size:14px;width:600px;font-family:sans-serif;border: none;background: transparent;'></input>");
         }
         else {
             var subtitle = "ch.set_subtitle('This is my default subtitle')"
@@ -974,13 +999,18 @@ function chart(style_name, gif) {
 
         this.g.append("g")
             .attr("class", "grid")
+            .attr("stroke", "lightgrey")
+            .attr("opacity", 0.7)
             .attr("transform", "translate(0," + this.HEIGHT + ")")
             .call(make_x_axis()
             .tickSize(-this.HEIGHT, 0, 0)
             .tickFormat("")
+
         )
         this.g.append("g")
             .attr("class", "grid")
+            .attr("stroke", "lightgrey")
+            .attr("opacity", 0.7)
             .call(make_y_axis()
             .tickSize(-this.WIDTH, 0, 0)
             .tickFormat("")
@@ -994,7 +1024,7 @@ function chart(style_name, gif) {
                 .attr("class", "externalObject")
                 .attr("y", 0 - this.MARGIN.left/1.3) // minus goes left
                 .attr("x", 0 - ((this.MARGIN.top + this.MARGIN.bottom + this.HEIGHT)/2.2)) // minus goes down 
-                .html("<input type='text' id='ylabel_input' placeholder='Click to add label' class='chart_input' style='box-shadow:none;'></input>")
+                .html("<input type='text' id='ylabel_input' placeholder='Click to add label' class='chart_input' style='box-shadow:none;text-align: center;font-size: 12px;font-family:sans-serif;border: none;background: transparent;'></input>")
                 .attr("transform", "rotate(-90)");
         }
         else {
@@ -1004,6 +1034,7 @@ function chart(style_name, gif) {
                 .attr("x", 0 - ((this.MARGIN.top + this.MARGIN.bottom + this.HEIGHT)/2)) // minus goes down 
                 .attr("dy", "1em")
                 .style("text-anchor", "middle")
+                .style("font", "12px Arial")
                 .attr("id","ylabel")
                 .text("ch.set_ylabel('My Label')");
         }
@@ -1024,7 +1055,7 @@ function chart(style_name, gif) {
                 .attr("class", "externalObject")
                 .attr("y", (this.HEIGHT + 25))
                 .attr("x", (this.WIDTH - 305 - 300))
-                .html("<input type='text' id='xlabel_input' placeholder='Click to add label' class='chart_input' style='box-shadow:none;'></input>");
+                .html("<input type='text' id='xlabel_input' placeholder='Click to add label' class='chart_input' style='box-shadow:none;text-align: center;font-size: 12px;width:300px;font-family:sans-serif;border: none;background: transparent;'></input>");
         }
         else {
             this.svg.append("text")
@@ -1096,6 +1127,7 @@ function chart(style_name, gif) {
             .attr("dy", "0.3em")
             .style("text-anchor", "left")
             .attr("id","ylabel")
+            .style("font", "12px Arial")
             .text(label);
 
         this.svg.append("line")
@@ -1104,10 +1136,13 @@ function chart(style_name, gif) {
             .attr("y1", this.LEGEND_NUM*15 + this.MARGIN.top) // adding goes down
             .attr("y2", this.LEGEND_NUM*15 + this.MARGIN.top)
             .attr("stroke-width", 2)
-            .attr("stroke", currline_color); // adding goes down
+            .attr("stroke", currline_color) // adding goes down
+            .style("fill", "none");
         this.LEGEND_NUM = this.LEGEND_NUM+1
 
     }
+
+
 
 
     this.set_ymin = function(ymin) {
@@ -1190,3 +1225,7 @@ function chart(style_name, gif) {
 
     
 };
+
+// d3.selectAll(".ticks").style("font", "50px Arial")
+
+
