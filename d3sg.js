@@ -1,3 +1,10 @@
+Date.prototype.addDays = function(days)
+{
+    var dat = new Date(this.valueOf());
+    dat.setDate(dat.getDate() + days);
+    return dat;
+}
+
 function chart(style_name, gif) {
 
 
@@ -138,6 +145,7 @@ function chart(style_name, gif) {
                 current_dict['x'] = x[i];
                 current_dict['delta'] = pct_chng[i];
                 this.DATA.push(current_dict);
+                if (kwargs['x_tick_labels'] != undefined) {current_dict['tick_label'] = kwargs["x_tick_labels"][i]};
             }
 
         
@@ -216,9 +224,30 @@ function chart(style_name, gif) {
         x_scale.domain([x_curr_min, x_curr_max]);
     }
 
+    this._scale_numerical_x_data_for_bar = function(underscore_label) {
+        var data_dict = this.DATA_DICT
+        var x_curr_max = -1000000;
+        var x_curr_min = 1000000;
+        $.each(data_dict, function( index, value ) {
+            var x_new_max = d3.max(data_dict[index]["values"], function(d) { return d.x; })
+            var x_new_min = d3.min(data_dict[index]["values"], function(d) { return d.x; })
+            if (x_new_max >= x_curr_max) {x_curr_max = x_new_max;}
+            if (x_new_min < x_curr_min) {x_curr_min = x_new_min;}
+        });
+        x_scale.domain([x_curr_min, x_curr_max+1]);
+    }
+
     this._scale_date_x_data = function(underscore_label) {
         var current_data = this.DATA_DICT[underscore_label]["values"]
         x_scale.domain(d3.extent(current_data, function(d) { return d.x; }));
+    }
+
+    this._scale_date_x_data_for_bar = function(underscore_label) {
+        var current_data = this.DATA_DICT[underscore_label]["values"]
+        var bar_dates = d3.extent(current_data, function(d) { return d.x; })
+        bar_dates[1] = bar_dates[1].addDays(1)
+        x_scale.domain(bar_dates);
+
     }
 
     this._draw_area = function(underscore_label, label) {
@@ -335,6 +364,7 @@ function chart(style_name, gif) {
         var _mouseover_node = parent_this._mouseover_node
         var _mousemove_node = parent_this._mousemove_node
         var _mouseout_node = parent_this._mouseout_node
+        var x_is_dates = parent_this.x_is_dates
 
         var nodes = current_g.selectAll('circle.node')
                 .data(data_dict[index]["values"])
@@ -347,12 +377,11 @@ function chart(style_name, gif) {
               .attr('r', 3)
               .style("fill", data_dict[index]["color"])
               .style("opacity", data_dict[index]["alpha"])
-              .on("mouseover", function(d) {_mouseover_node(d3.select(this), d, data_dict[index]["label"], data_dict[index]["color"]);})
+              .on("mouseover", function(d) {_mouseover_node(d3.select(this), d, data_dict[index]["label"], data_dict[index]["color"], x_is_dates);})
               .on("mousemove", function() {_mousemove_node(d3.select(this))})
               .on("mouseout", function() {_mouseout_node(d3.select(this))});
 
         }
-
 
 
     var tooltip = d3.select("body")
@@ -379,15 +408,29 @@ function chart(style_name, gif) {
         .attr("class", "tip_foot2");
 
 
-    this._mouseover_node = function(node, d, label, color) {
+    this._mouseover_node = function(node, d, label, color, is_x_dates) {
 
-        day_of_week_map = {0:'Sunday', 1:'Monday', 2:'Tuesday', 3:'Wednesday', 4:'Thursday', 5:'Friday', 6:'Saturday'}
-        y_rounded = Math.round(d.y * 100) / 100;
-        delta_rounded = Math.round(d.delta * 100) / 100;
-        if (delta_rounded >= 0) {wow_color = "#458B00"} else {wow_color = "#CD2626"}
-        x_date = format_date(d.x) + " (" + day_of_week_map[d.x.getDay()] + ")";
-        text_to_display = y_rounded
-
+        if (is_x_dates) {
+            day_of_week_map = {0:'Sunday', 1:'Monday', 2:'Tuesday', 3:'Wednesday', 4:'Thursday', 5:'Friday', 6:'Saturday'}
+            y_rounded = Math.round(d.y * 100) / 100;
+            delta_rounded = Math.round(d.delta * 100) / 100;
+            if (delta_rounded >= 0) {wow_color = "#458B00"} else {wow_color = "#CD2626"}
+            x_date = format_date(d.x) + " (" + day_of_week_map[d.x.getDay()] + ")";
+            text_to_display = y_rounded
+            tip_foot2
+                .style("color", wow_color)
+                .text("WoW: " + delta_rounded + "%");
+        } else {
+            wow_color = "#458B00"
+            text_to_display = Math.round(d.y * 100) / 100;
+            delta_rounded = "NaN"
+            if (d.tick_label !== undefined) {
+                x_date = d.tick_label
+            } else {
+                x_date = d.x
+            }
+            
+        }
 
         node.transition().attr("r", 6)
 
@@ -400,9 +443,7 @@ function chart(style_name, gif) {
         tip_foot
             .style("color", color)
             .text("Value: " + text_to_display);
-        tip_foot2
-            .style("color", wow_color)
-            .text("WoW: " + delta_rounded + "%");
+        
 
         return tooltip
     }
@@ -417,50 +458,7 @@ function chart(style_name, gif) {
 
 
 
-    this._draw_bar = function(label, bar_width) {
 
-        // this.g.selectAll("rect").remove();
-
-        var current_g = this.g;
-        var svg = this.svg
-        var color_scheme = this._LOLLIPOP;
-        var line_num = 0;
-        var data_dict = this.DATA_DICT
-        var line_dict= this.LINE_DICT
-        var margin = this.MARGIN
-        var height = this.HEIGHT
-        var index = label
-        var width = this.WIDTH
-
-        n_series = Object.keys(data_dict).length
-        current_g.selectAll(".bar").remove();
-
-        $.each(data_dict, function( index, value ) {
-
-            // Have colors loop
-            line_num = line_num % 9;
-            bar_width = width / (n_series*data_dict[index]["values"].length) - 0.5
-            bar_width = bar_width / n_series
-
-            var bar = current_g.selectAll("rect.bar")
-                .data(data_dict[index]["values"])
-              .enter().append("g")
-                .attr("transform", function(d, i) {return "translate(" + (bar_width*line_num + x_scale(d.x) - bar_width/2) +  ", " + (y_scale(d.y)) + ")"; })
-                .attr("class","bar");
-
-            bar.append("rect")
-                .attr("height", function(d) { return height - y_scale(d.y); })
-                .attr("width", bar_width)
-                .style("stroke-width",0)
-                .style("fill",color_scheme[line_num]["color"])
-                .on("mouseover", function(d) {d3.select(this).style("opacity", 0.5);})
-                .on("mouseout", function(d) {d3.select(this).style("opacity", 1);});
-
-            line_num = line_num + 1
-
-        });
-        
-    }
 
 
 
@@ -533,15 +531,37 @@ function chart(style_name, gif) {
             .call(y_axis);
     }
 
-    this._add_numeric_x_axis = function() {
+    // this._add_numeric_x_axis = function() {
+    //     this.svg.selectAll('g.x.axis').remove()
+    //     x_axis = d3.svg.axis().scale(x_scale)
+    //         .orient("bottom").ticks(10);
+    //     this.g.append("g") // Add the Y Axis
+    //         .attr("class", "x axis")
+    //         .attr("transform", "translate(0," + this.HEIGHT + ")")
+    //         .call(x_axis);
+    // }
+
+    this._add_numeric_x_axis = function(labels) {
+        
         this.svg.selectAll('g.x.axis').remove()
         x_axis = d3.svg.axis().scale(x_scale)
-            .orient("bottom").ticks(10);
+
+        if (labels !== undefined) {
+            var n_ticks = labels.length;
+            x_axis.tickFormat(function(d, i){ return labels[i]});
+        } else {
+            var n_ticks = 10
+        }
+
+        x_axis.orient("bottom").ticks(n_ticks);
+
         this.g.append("g") // Add the Y Axis
             .attr("class", "x axis")
             .attr("transform", "translate(0," + this.HEIGHT + ")")
             .call(x_axis);
+
     }
+
 
     this._add_date_x_axis = function() {
         this.svg.selectAll('g.x.axis').remove();
@@ -599,7 +619,6 @@ function chart(style_name, gif) {
 
         this._add_grid_lines();
         this._draw_area(underscore_label, label);
-        // // this._add_axes();
         this._add_numeric_y_axis();
         this._add_date_x_axis();
 
@@ -615,6 +634,10 @@ function chart(style_name, gif) {
 
     this.line = function(x, y, label, kwargs) {
 
+        this._draw = this._draw_line
+        this.x_is_dates = this._is_dates(x);
+        this.x_is_numeric = this.isNumeric(x)
+
         var underscore_label = label//'series_' + this.LINE_NUM;
 
         if (label == undefined) {label = underscore_label};
@@ -626,6 +649,10 @@ function chart(style_name, gif) {
         if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
         if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
 
+        if (!this.x_is_numeric &&  !this.x_is_dates) { // string labels\
+            kwargs["x_tick_labels"] = x
+            x = Array.apply(null, Array(x.length)).map(function (_, i) {return i;});
+        }
 
         var color_scheme = this._LOLLIPOP;
         this.LABEL_DICT[label] = underscore_label;
@@ -633,25 +660,35 @@ function chart(style_name, gif) {
         var data_args = {'x':x, 'y':y}
 
         this._create_data_for_d3(data_args, underscore_label, label, kwargs);
-        // Line
-        if (x[0].length > 10) {
-            this.DATA.forEach(function(d) {d.x = parseDatetime(d.x)});
+
+
+        if (this.x_is_dates) {
+
+            if (x[0].length > 10) {
+                this.DATA.forEach(function(d) {d.x = parseDatetime(d.x)});
+            } else {
+                this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
+            }
+
+            x_scale = d3.time.scale().range([0, this.WIDTH]);
+            this._scale_date_x_data(underscore_label)
+
         }
         else {
-            this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
+            x_scale = d3.scale.linear().range([0, this.WIDTH]);
+            this._scale_numerical_x_data(underscore_label)
         }
 
-
-        x_scale = d3.time.scale().range([0, this.WIDTH]); // Line
         this._scale_numerical_y_data(underscore_label)
-        this._scale_date_x_data(underscore_label)
-
         this._add_grid_lines();
         this._draw_line(underscore_label, label);
-        // this._add_axes();
         this._add_numeric_y_axis();
-        this._add_date_x_axis();
 
+        if (this.x_is_dates) {
+            this._add_date_x_axis();
+        } else {
+            this._add_numeric_x_axis(kwargs['x_tick_labels']);
+        }
 
 
         var currline_color = this.DATA_DICT[underscore_label]['color'];
@@ -662,35 +699,157 @@ function chart(style_name, gif) {
     }
 
 
+    this._draw_bar = function(label, bar_width) {
 
-    this.bar = function(x, y, label, bar_width) {
+        // this.g.selectAll("rect").remove();
 
+        var current_g = this.g;
+        var svg = this.svg
+        var color_scheme = this._LOLLIPOP;
+        var line_num = 0;
+        var data_dict = this.DATA_DICT
+        var line_dict= this.LINE_DICT
+        var margin = this.MARGIN
+        var height = this.HEIGHT
+        var index = label
+        var width = this.WIDTH
+        var x_is_dates = this.x_is_dates
 
+        var _mouseover_node = this._mouseover_node;
+        var _mousemove_node = this._mousemove_node;
+        var _mouseout_node = this._mouseout_node;
 
-        if (bar_width == undefined){
-            bar_width=2
+        n_series = Object.keys(data_dict).length
+        current_g.selectAll(".bar").remove();
+
+        $.each(data_dict, function( index, value ) {
+
+            // Have colors loop
+            line_num = line_num % 9;
+
+            bar_width = width / (n_series*data_dict[index]["values"].length) - 0.5
+            bar_width = bar_width / n_series
+
+            var bar = current_g.selectAll("rect.bar")
+                .data(data_dict[index]["values"])
+              .enter().append("g")
+                // .attr("transform", function(d, i) {return "translate(" + (bar_width*line_num + x_scale(d.x) - bar_width/2) +  ", " + (y_scale(d.y)) + ")"; })
+                .attr("transform", function(d, i) {return "translate(" + ( x_scale(d.x)) +  ", " + (y_scale(d.y)) + ")"; })
+                
+                .attr("class","bar");
+
+            bar.append("rect")
+                .attr("height", function(d) { return height - y_scale(d.y); })
+                .attr("width", bar_width)
+                .style("stroke-width",0)
+                .style("fill",color_scheme[line_num]["color"])
+                .on("mouseover", function(d) {d3.select(this).style("opacity", 0.5); _mouseover_node(d3.select(this), d, data_dict[index]["label"], data_dict[index]["color"], x_is_dates);})
+                .on("mousemove", function() {_mousemove_node(d3.select(this))})
+                .on("mouseout", function() {d3.select(this).style("opacity", 1); _mouseout_node(d3.select(this))});
+
+            line_num = line_num + 1
+
+        });
+        
+    }
+
+    this._is_dates = function(x) {
+
+        var is_it = true;
+
+        try {
+            parseDate(x[0])
+            is_it = is_it && true
+        }
+        catch(err) {
+            is_it = is_it && false
+            return is_it
         }
 
-        var underscore_label = 'series_' + this.LINE_NUM;
+        try {
+            parseDatetime(x[0])
+            is_it = is_it && true
+        }
+        catch(err) {
+            is_it = is_it && false
+            return is_it
+        }
+
+        if ((parseDate(x[0]) == null) && (parseDatetime(x[0]) == null)) {
+            is_it = is_it && false
+        }
+
+        return is_it
+
+    }
+
+
+    this.isNumeric = function(x) {
+      return !isNaN(parseFloat(x[0])) && isFinite(x[0]);
+    }
+
+    this.bar = function(x, y, label, kwargs) {
+
+        this._draw = this._draw_bar
+        this.x_is_dates = this._is_dates(x);
+        this.x_is_numeric = this.isNumeric(x)
+
+        var underscore_label = label//'series_' + this.LINE_NUM;
+
         if (label == undefined) {label = underscore_label};
+        if (kwargs == undefined) {
+            kwargs = {}
+            kwargs['alpha']=1;
+            kwargs['add_legend']=true;
+        };
+        if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
+        if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
+
+        if (!this.x_is_numeric &&  !this.x_is_dates) { // string labels\
+            kwargs["x_tick_labels"] = x
+            x = Array.apply(null, Array(x.length)).map(function (_, i) {return i;});
+        }
+
+
+        var color_scheme = this._LOLLIPOP;
         this.LABEL_DICT[label] = underscore_label;
 
-        this._create_data_for_d3(x, y, underscore_label);
-        // Bar
-        this.DATA.forEach(function(d) {
-            split_x = d.x.split("-")
-            d.x = new Date(Date.UTC(split_x[0],split_x[1]-1,split_x[2],0,0,0));
-        });
-        x_scale = d3.time.scale().range([width/this.DATA.length/2, width-width/this.DATA.length/2]); // Bar
+        var data_args = {'x':x, 'y':y}
 
-        this._scale_data(underscore_label);
+        this._create_data_for_d3(data_args, underscore_label, label, kwargs);
+
+
+        if (this.x_is_dates) {
+
+            if (x[0].length > 10) {
+                this.DATA.forEach(function(d) {d.x = parseDatetime(d.x)});
+            } else {
+                this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
+            }
+
+            x_scale = d3.time.scale().range([0, this.WIDTH]);
+            this._scale_date_x_data_for_bar(underscore_label)
+
+        }
+        else {
+            x_scale = d3.scale.linear().range([0, this.WIDTH]);
+            this._scale_numerical_x_data_for_bar(underscore_label)
+        }
+
+        this._scale_numerical_y_data(underscore_label)
         this._add_grid_lines();
+        this._draw_bar(underscore_label, label);
+        this._add_numeric_y_axis();
 
-        this._draw_bar(underscore_label, bar_width);
-        
-        this._add_axes();
-        this._add_legend(label);
-        this.LINE_NUM = this.LINE_NUM + 1;
+        if (this.x_is_dates) {
+            this._add_date_x_axis();
+        } else {
+            this._add_numeric_x_axis(kwargs["x_tick_labels"]);
+        }
+
+        var currline_color = this.DATA_DICT[underscore_label]['color'];
+        if (kwargs['add_legend']) {this._add_legend(label, currline_color);}
+        if (kwargs['color_from'] == undefined) {this.LINE_NUM = this.LINE_NUM + 1;}
 
     }
 
@@ -962,9 +1121,14 @@ function chart(style_name, gif) {
         // Add all data back with correct new scaling
         this._scale_numerical_y_data()
         this._add_grid_lines();
-        this._draw_line();
+        this._draw();
         this._add_numeric_y_axis();
-        this._add_date_x_axis();
+
+        if (this.x_is_dates) { 
+            this._add_date_x_axis();
+        } else {
+            this._add_numeric_x_axis();
+        }
 
     }
 
@@ -979,9 +1143,13 @@ function chart(style_name, gif) {
         // Add all data back with correct new scaling
         this._scale_numerical_y_data()
         this._add_grid_lines();
-        this._draw_line();
+        this._draw();
         this._add_numeric_y_axis();
-        this._add_date_x_axis();
+        if (this.x_is_dates) { 
+            this._add_date_x_axis();
+        } else {
+            this._add_numeric_x_axis();
+        }
 
     }
 
@@ -998,9 +1166,13 @@ function chart(style_name, gif) {
         // Add all data back with correct new scaling
         this._scale_numerical_y_data()
         this._add_grid_lines();
-        this._draw_line();
+        this._draw();
         this._add_numeric_y_axis();
-        this._add_date_x_axis();
+        if (this.x_is_dates) { 
+            this._add_date_x_axis();
+        } else {
+            this._add_numeric_x_axis();
+        }
     }
 
     this._create_canvas();
