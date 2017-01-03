@@ -158,11 +158,11 @@ function chart(style_name, gif) {
 
         color_num = this.LINE_NUM % 9;
 
-        if (kwargs['color_from'] == undefined) {
+        var _color = kwargs['color_from'] || kwargs['color'];
+
+
+        if (!_color) {
             var _color = color_scheme[color_num]["color"]
-        }
-        else {
-            var _color = this.DATA_DICT[kwargs['color_from']]["color"]
         }
 
         this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color, }
@@ -717,6 +717,8 @@ function chart(style_name, gif) {
 
 
         var currline_color = this.DATA_DICT[underscore_label]['color'];
+
+
         if (kwargs['add_legend']) {this._add_legend(label, currline_color);}
         if (kwargs['color_from'] == undefined) {this.LINE_NUM = this.LINE_NUM + 1;}
         
