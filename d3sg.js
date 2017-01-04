@@ -657,6 +657,84 @@ function chart(style_name, gif) {
 
 
 
+
+    this.batch_add_data = function(x, y, label, kwargs) {
+
+        this._draw = this._draw_line
+        this.x_is_dates = this._is_dates(x);
+        this.x_is_numeric = this.isNumeric(x)
+
+        var underscore_label = label//'series_' + this.LINE_NUM;
+
+        if (label == undefined) {label = underscore_label};
+        if (kwargs == undefined) {
+            kwargs = {}
+            kwargs['alpha']=1;
+            kwargs['add_legend']=true;
+        };
+        if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
+        if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
+
+        if (!this.x_is_numeric &&  !this.x_is_dates) { // string labels\
+            kwargs["x_tick_labels"] = x
+            x = Array.apply(null, Array(x.length)).map(function (_, i) {return i;});
+        }
+
+        var color_scheme = this._LOLLIPOP;
+        this.LABEL_DICT[label] = underscore_label;
+
+        var data_args = {'x':x, 'y':y}
+
+        this._create_data_for_d3(data_args, underscore_label, label, kwargs);
+
+
+        if (this.x_is_dates) {
+
+            if (x[0].length > 10) {
+                this.DATA.forEach(function(d) {d.x = parseDatetime(d.x)});
+            } else {
+                this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
+            }
+
+            x_scale = d3.time.scale().range([0, this.WIDTH]);
+            this._scale_date_x_data(underscore_label)
+
+        }
+        else {
+            x_scale = d3.scale.linear().range([0, this.WIDTH]);
+            this._scale_numerical_x_data(underscore_label)
+        }
+
+        this._scale_numerical_y_data(underscore_label)
+
+        if (this.x_is_dates) {
+            this._add_date_x_axis();
+        } else {
+            this._add_numeric_x_axis(kwargs['x_tick_labels']);
+        }
+
+
+        var currline_color = this.DATA_DICT[underscore_label]['color'];
+
+
+        if (kwargs['add_legend']) {this._add_legend(label, currline_color);}
+        if (kwargs['color_from'] == undefined) {this.LINE_NUM = this.LINE_NUM + 1;}
+
+    }
+
+
+    this.batch_draw_lines = function(kwargs) {
+
+        this._add_grid_lines();
+        this._draw_line('--', '--');
+        this._add_numeric_y_axis();
+
+
+    }
+
+
+
+
     this.line = function(x, y, label, kwargs) {
 
         this._draw = this._draw_line
