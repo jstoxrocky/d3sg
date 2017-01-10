@@ -328,6 +328,7 @@ function chart(style_name, gif) {
             line_num = line_num % 9;
 
             var valueline = d3.svg.line()
+                .defined(function(d) { return d.y != null })
                 .x( function(d) { return x_scale(d.x); })
                 .y( function(d) { return y_scale(d.y); });
 
