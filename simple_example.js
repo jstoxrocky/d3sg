@@ -63,6 +63,7 @@ $(document).ready(function(){
 	ch.line(x, y, 'a');
 	ch.line(x, y2, 'b');
 	ch.set_ymin(0);
+	ch.annotate_line("2013-02-03", "Official tracks released")
 	// // ch.set_ymax(180);
 	// // ch.set_ylim(50, 180)
 	$('#ch1').append(ch.svg.node())

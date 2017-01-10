@@ -206,6 +206,9 @@ function chart(style_name, gif) {
 
         y_scale.domain([ymin, ymax]);
 
+        this.calc_ymin = ymin;
+        this.calc_ymax = ymax;
+
         // y_scale.domain([0, 300]); // JOEY EDIT
 
     }
@@ -303,6 +306,45 @@ function chart(style_name, gif) {
 
 
     }
+
+    this.annotate_line = function(x, note) {
+
+        _data = [{'x':x, 'y':this.calc_ymin}, {'x':x, 'y':this.calc_ymax}]
+
+        if (x[0].length > 10) {
+            _data.forEach(function(d) {d.x = parseDatetime(d.x)});
+            x = parseDatetime(x)
+        }
+        else {
+            _data.forEach(function(d) {d.x = parseDate(d.x)});
+            x = parseDate(x)
+        }
+
+        var current_g = this.g;
+
+        var lineFunction = d3.svg.line()
+                 .x(function(d) { return x_scale(d.x); })
+                 .y(function(d) { return y_scale(d.y); })
+                 .interpolate("linear");
+
+
+        var lineGraph = current_g.append("path")
+                   .attr("d", lineFunction(_data))
+                   .attr("stroke", "darkgrey")
+                   .attr("stroke-width", 2)
+                   .attr("stroke-dasharray","5,5")
+                   .attr("fill", "none");
+
+        var text = current_g.append('text')
+                    .attr("x", x_scale(x))
+                    .attr("y", y_scale(this.calc_ymax*0.99))
+                    .attr("dy", "-0.5em")
+                    .style("text-anchor", "end")
+                    .attr("transform", "rotate(-90," + x_scale(x) + "," + y_scale(this.calc_ymax*0.99) + ")")
+                    .text(note);
+
+    }
+
 
 
     this._draw_line = function(underscore_label, label) {
