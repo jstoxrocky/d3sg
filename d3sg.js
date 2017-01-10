@@ -370,9 +370,11 @@ function chart(style_name, gif) {
         var x_is_dates = parent_this.x_is_dates
 
         var nodes = current_g.selectAll('circle.node')
-                .data(data_dict[index]["values"])
+                .data(data_dict[index]["values"].filter(function(d) { if (d.y != null) {return d} }))
                 .enter().append('g')
                 .attr('class', 'node');
+
+
 
         nodes.append("circle")
               .attr('cx', function(d) {return x_scale(d.x);})

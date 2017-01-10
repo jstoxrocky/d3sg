@@ -34,8 +34,8 @@ $(document).ready(function(){
 
 	var x = ["2013-02-01", "2013-02-02", "2013-02-03", "2013-02-04"]
 	// var x = ['2016-05-04 22:00:53', '2016-05-04 22:12:23', '2016-05-04 22:27:53']
-	var y = [200, 190, null, 222]
-	// var y_bottom = [100, 150, 179]
+	var y = [null, null, 150, 222]
+	var y2 = [100, 213, 150, 179]
 	// var y_point = [150, 170, 181]
 
 	// var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
@@ -61,8 +61,8 @@ $(document).ready(function(){
 	ch.set_ylabel("(USD)");
 	ch.set_xlabel("(Registration Date)");
 	ch.line(x, y, 'a');
-	ch.line(x, y, 'b');
-	// // ch.set_ymin(0);
+	ch.line(x, y2, 'b');
+	ch.set_ymin(0);
 	// // ch.set_ymax(180);
 	// // ch.set_ylim(50, 180)
 	$('#ch1').append(ch.svg.node())
