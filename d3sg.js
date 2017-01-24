@@ -623,7 +623,7 @@ this._draw_area = function(underscore_label, label, data) {
                     .enter().append("circle")
                       .attr("cx", function(d) { return x_scale(d.x)})
                       .attr("cy", function(d) { return y_scale(d.y)})
-                      .attr("r", r.toString())
+                      .attr("r", kwargs['size'])
                       // .style("fill", function(d) { return "url(#"+data_dict[index]['url']+")"});
                       .style("fill", data_dict[index]["color"])
                       .style("opacity", kwargs['opacity'])
