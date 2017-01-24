@@ -32,10 +32,11 @@ $(document).ready(function(){
 
 
 
-	var x = ["2013-02-01", "2013-02-02", "2013-02-03", "2013-02-04"]
+	var x = [100,200, 300, 400, 500]
 	// var x = ['2016-05-04 22:00:53', '2016-05-04 22:12:23', '2016-05-04 22:27:53']
-	var y = [null, null, 150, 222]
-	var y2 = [100, 213, 150, 179]
+	var y = [1 ,1, 1, 1, 1]
+	var y2 = [2 ,2, 2, 2, 2]
+	// var y2 = [100, 213, 150, 179]
 	// var y_point = [150, 170, 181]
 
 	// var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
@@ -60,11 +61,14 @@ $(document).ready(function(){
 	ch.set_subtitle("The price of the three and six month T-Bills appear to follow a random walk.");
 	ch.set_ylabel("(USD)");
 	ch.set_xlabel("(Registration Date)");
-	ch.line(x, y, 'a');
-	ch.line(x, y2, 'b');
-	ch.set_ymin(0);
-	ch.annotate_line("2013-02-03", "Official tracks released")
-	// // ch.set_ymax(180);
+	
+	
+	ch.scatter(x, y, 'a', {"size":5});
+	ch.scatter(x, y2, 'b', {"size":5});
+	// ch.append_area(["2013-02-02", "2013-02-04"], [120, 120], [220, 220], "b", {"color":"#5DA5DA", "alpha":0.5})
+
+	// ch.set_ymin(0);
+	// ch.set_ymax(250)
 	// // ch.set_ylim(50, 180)
 	$('#ch1').append(ch.svg.node())
 

@@ -113,7 +113,7 @@ function chart(style_name, gif) {
     }
 
 
-    this._create_data_for_d3 = function (data_args, underscore_label, label, kwargs) {
+    this._create_data_for_d3 = function (data_args, underscore_label, label, kwargs, is_area) {
 
 
         var x = data_args['x'];
@@ -165,6 +165,9 @@ function chart(style_name, gif) {
             var _color = color_scheme[color_num]["color"]
         }
 
+        if (is_area) {
+            return {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color, }
+        }
         this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color, }
         if (kwargs['url'] != undefined) {this.DATA_DICT[underscore_label]['url'] = kwargs['url']};
     }
@@ -253,7 +256,8 @@ function chart(style_name, gif) {
 
     }
 
-    this._draw_area = function(underscore_label, label) {
+
+this._draw_area = function(underscore_label, label, data) {
 
 
         this.g.selectAll("path").remove();
@@ -270,13 +274,17 @@ function chart(style_name, gif) {
         parent_this = this
 
         this.g.selectAll('.node').remove()
-        // console.log(a)
-        $.each(data_dict, function( index, value ) {
+        // $.each(data_dict, function( index, value ) {
+
+
+            console.log('b')
+            console.log(data["values"])
 
             // Have colors loop
             line_num = line_num % 9;
 
             var valueline = d3.svg.area()
+                .defined(function(d) { return d.y != null })
                 .x( function(d) { return x_scale(d.x); })
                 .y0( function(d) { return y_scale(d.y_bottom); })
                 .y1( function(d) { return y_scale(d.y); });
@@ -284,28 +292,84 @@ function chart(style_name, gif) {
             line_dict[index] = valueline
 
             current_g.append("path")
-                .attr("d", valueline(data_dict[index]["values"]))
-                .style("stroke",data_dict[index]["color"])
-                .style("opacity", data_dict[index]["alpha"])
-                .style('fill', data_dict[index]["color"])
+                .attr("d", valueline(data["values"]))
+                .style("stroke",data["color"])
+                .style("opacity", data["alpha"])
+                .style('fill', data["color"])
                 .style("stroke-width", 2)
                 .attr("id",index)
                 .attr("class","line")
-                // .attr("fill", "none")
+                .style('fill', data["color"])
                 .on("mouseover", function() {d3.select(this).transition().style("stroke-width", 4);})
                 .on("mouseout", function() {d3.select(this).transition().style("stroke-width", 2);});
 
+            // _draw_nodes(parent_this, index, line_num)
             line_num = line_num + 1
 
 
-
-
-
-        });
+// 
+        // });
 
 
 
     }
+    
+
+
+
+    // this._draw_area = function(underscore_label, label) {
+
+
+    //     this.g.selectAll("path").remove();
+
+    //     var current_g = this.g;
+    //     var color_scheme = this._LOLLIPOP;
+    //     var line_num = 0;
+    //     var data_dict = this.DATA_DICT
+    //     var line_dict= this.LINE_DICT
+    //     var index = underscore_label
+    //     var svg = this.svg
+    //     var _draw_nodes = this._draw_nodes
+
+    //     parent_this = this
+
+    //     this.g.selectAll('.node').remove()
+    //     // console.log(a)
+    //     $.each(data_dict, function( index, value ) {
+
+    //         // Have colors loop
+    //         line_num = line_num % 9;
+
+    //         var valueline = d3.svg.area()
+    //             .x( function(d) { return x_scale(d.x); })
+    //             .y0( function(d) { return y_scale(d.y_bottom); })
+    //             .y1( function(d) { return y_scale(d.y); });
+
+    //         line_dict[index] = valueline
+
+    //         current_g.append("path")
+    //             .attr("d", valueline(data_dict[index]["values"]))
+    //             .style("stroke",data_dict[index]["color"])
+    //             .style("opacity", data_dict[index]["alpha"])
+    //             .style('fill', data_dict[index]["color"])
+    //             .style("stroke-width", 2)
+    //             .attr("id",index)
+    //             .attr("class","line")
+    //             // .attr("fill", "none")
+    //             .on("mouseover", function() {d3.select(this).transition().style("stroke-width", 4);})
+    //             .on("mouseout", function() {d3.select(this).transition().style("stroke-width", 2);});
+
+    //         line_num = line_num + 1
+
+
+
+
+
+    //     });
+
+
+
+    // }
 
     this.annotate_line = function(x, note) {
 
@@ -365,6 +429,7 @@ function chart(style_name, gif) {
 
         this.g.selectAll('.node').remove()
         $.each(data_dict, function( index, value ) {
+
 
             // Have colors loop
             line_num = line_num % 9;
@@ -518,7 +583,7 @@ function chart(style_name, gif) {
 
 
 
-    this._draw_scatter = function(label, kwargs) {
+    this._draw_scatter = function(label, _label, kwargs) {
 
 
         var current_g = this.g;
@@ -530,27 +595,28 @@ function chart(style_name, gif) {
         current_g.selectAll("circle").remove();
         current_g.selectAll("defs").remove();
 
+        console.log(data_dict)
         $.each(data_dict, function( index, value ) {
 
-        var r = kwargs['size'];
+        var r = 6//kwargs['size'];
         var gif_x = r - 800*0.1*0.5
         var gif_y = r - 400*0.1*0.5
 
-            current_g.selectAll("defs.scatter_defs")
-              .data(data_dict[index]["values"])
-            .enter().append("defs")
-              .append("pattern")
-                   .attr("id", data_dict[index]['url'])
-                   .attr('x',"0")
-                   .attr('y',"0")
-                   .attr('height',"100%")
-                   .attr('width',"100%")
-                        .append("image")
-                        .attr('x',gif_x) // loc of gif
-                        .attr('y',gif_y) // loc of gif
-                        .attr('height',"10%") // height of gif
-                        .attr('width',"10%") // width of gif
-                        .attr("xlink:href", data_dict[index]['url'])
+            // current_g.selectAll("defs.scatter_defs")
+            //   .data(data_dict[index]["values"])
+            // .enter().append("defs")
+            //   .append("pattern")
+            //        .attr("id", data_dict[index]['url'])
+            //        .attr('x',"0")
+            //        .attr('y',"0")
+            //        .attr('height',"100%")
+            //        .attr('width',"100%")
+            //             .append("image")
+            //             .attr('x',gif_x) // loc of gif
+            //             .attr('y',gif_y) // loc of gif
+            //             .attr('height',"10%") // height of gif
+            //             .attr('width',"10%") // width of gif
+            //             .attr("xlink:href", data_dict[index]['url'])
 
               c = current_g.selectAll("circle.scatters")
                   .data(data_dict[index]["values"])
@@ -558,7 +624,9 @@ function chart(style_name, gif) {
                       .attr("cx", function(d) { return x_scale(d.x)})
                       .attr("cy", function(d) { return y_scale(d.y)})
                       .attr("r", r.toString())
-                      .style("fill", function(d) { return "url(#"+data_dict[index]['url']+")"});
+                      // .style("fill", function(d) { return "url(#"+data_dict[index]['url']+")"});
+                      .style("fill", data_dict[index]["color"])
+                      // .attr('class','scatters')
 
             line_num = line_num + 1
 
@@ -654,8 +722,13 @@ function chart(style_name, gif) {
     }
 
 
-    this.area = function(x, y, y_bottom, label, kwargs) {
-                var underscore_label = label//'series_' + this.LINE_NUM;
+    this.append_area = function(x, y, y_bottom, label, kwargs) {
+
+        this._draw = this._draw_area
+        this.x_is_dates = this._is_dates(x);
+        this.x_is_numeric = this.isNumeric(x)
+
+        var underscore_label = label//'series_' + this.LINE_NUM;
 
         if (label == undefined) {label = underscore_label};
         if (kwargs == undefined) {
@@ -666,38 +739,191 @@ function chart(style_name, gif) {
         if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
         if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
 
+        if (!this.x_is_numeric &&  !this.x_is_dates) { // string labels\
+            kwargs["x_tick_labels"] = x
+            x = Array.apply(null, Array(x.length)).map(function (_, i) {return i;});
+        }
 
         var color_scheme = this._LOLLIPOP;
         this.LABEL_DICT[label] = underscore_label;
 
         data_args = {'x':x, 'y':y, 'y_bottom':y_bottom}
 
+        var valueline = d3.svg.area()
+                .x( function(d) { return x_scale(d.x); })
+                .y0( function(d) { return y_scale(d.y_bottom); })
+                .y1( function(d) { return y_scale(d.y); });
 
-        this._create_data_for_d3(data_args, underscore_label, label, kwargs);
-        // Line
-        if (x[0].length > 10) {
-            this.DATA.forEach(function(d) {d.x = parseDatetime(d.x)});
+
+        
+        var _data = []
+            for (var i = 0; i < x.length; i += 1) {
+                var current_dict = {};
+                current_dict['y'] = y[i];
+                if (y_bottom != undefined) {current_dict['y_bottom'] = y_bottom[i]};
+                current_dict['x'] = x[i];
+                // current_dict['delta'] = pct_chng[i];
+                _data.push(current_dict);
+                if (kwargs['x_tick_labels'] != undefined) {current_dict['tick_label'] = kwargs["x_tick_labels"][i]};
+            }
+
+        // console.log(_data)
+        if (this.x_is_dates) {
+
+            if (x[0].length > 10) {
+                _data.forEach(function(d) {d.x = parseDatetime(d.x)});
+            } else {
+                _data.forEach(function(d) {d.x = parseDate(d.x)});
+            }
         }
-        else {
-            this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
-        }
+        //     x_scale = d3.time.scale().range([0, this.WIDTH]);
+        //     x_scale.domain(d3.extent(_data, function(d) { return d.x; }));
 
+        // }
+        // else {
+        //     x_scale = d3.scale.linear().range([0, this.WIDTH]);
+        //     this._scale_numerical_x_data(underscore_label)
+        // }
 
-        x_scale = d3.time.scale().range([0, this.WIDTH]); // Line
-        this._scale_numerical_y_data(underscore_label)
-        this._scale_date_x_data(underscore_label)
+        // this._scale_numerical_y_data(underscore_label)
 
-        this._add_grid_lines();
-        this._draw_area(underscore_label, label);
-        this._add_numeric_y_axis();
-        this._add_date_x_axis();
+        this.g.append("path")
+            .attr("d", valueline(_data))
+            .style("stroke", kwargs['color'])
+            .style("opacity", kwargs['alpha'])
+            .style('fill', kwargs['color'])
+            .style("stroke-width", null)
+            // .attr("class","line")
+            .on("mouseover", function() {d3.select(this).transition().style("stroke-width", 4);})
+            .on("mouseout", function() {d3.select(this).transition().style("stroke-width", 0);});
 
+        
 
-
-        var currline_color = this.DATA_DICT[underscore_label]['color'];
-        if (kwargs['add_legend']) {this._add_legend(label, currline_color);}
-        if (kwargs['color_from'] == undefined) {this.LINE_NUM = this.LINE_NUM + 1;}
     }
+
+    // this.area = function(x, y, y_bottom, label, kwargs) {
+
+    //     this._draw = this._draw_area
+    //     this.x_is_dates = this._is_dates(x);
+    //     this.x_is_numeric = this.isNumeric(x)
+
+    //     var underscore_label = label//'series_' + this.LINE_NUM;
+
+    //     if (label == undefined) {label = underscore_label};
+    //     if (kwargs == undefined) {
+    //         kwargs = {}
+    //         kwargs['alpha']=1;
+    //         kwargs['add_legend']=true;
+    //     };
+    //     if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
+    //     if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
+
+    //     if (!this.x_is_numeric &&  !this.x_is_dates) { // string labels\
+    //         kwargs["x_tick_labels"] = x
+    //         x = Array.apply(null, Array(x.length)).map(function (_, i) {return i;});
+    //     }
+
+    //     var color_scheme = this._LOLLIPOP;
+    //     this.LABEL_DICT[label] = underscore_label;
+
+    //     data_args = {'x':x, 'y':y, 'y_bottom':y_bottom}
+
+    //     this._create_data_for_d3(data_args, underscore_label, label, kwargs);
+
+
+    //     if (this.x_is_dates) {
+
+    //         if (x[0].length > 10) {
+    //             this.DATA.forEach(function(d) {d.x = parseDatetime(d.x)});
+    //         } else {
+    //             this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
+    //         }
+
+    //         x_scale = d3.time.scale().range([0, this.WIDTH]);
+    //         this._scale_date_x_data(underscore_label)
+
+    //     }
+    //     else {
+    //         x_scale = d3.scale.linear().range([0, this.WIDTH]);
+    //         this._scale_numerical_x_data(underscore_label)
+    //     }
+
+    //     this._scale_numerical_y_data(underscore_label)
+    //     this._add_grid_lines();
+    //     this._draw_area(underscore_label, label);
+    //     this._add_numeric_y_axis();
+
+    //     if (this.x_is_dates) {
+    //         this._add_date_x_axis();
+    //     } else {
+    //         this._add_numeric_x_axis(kwargs['x_tick_labels']);
+    //     }
+
+
+    //     var currline_color = this.DATA_DICT[underscore_label]['color'];
+
+
+    //     if (kwargs['add_legend']) {this._add_legend(label, currline_color);}
+    //     if (kwargs['color_from'] == undefined) {this.LINE_NUM = this.LINE_NUM + 1;}
+        
+
+    // }
+
+
+
+    // this.area = function(x, y, y_bottom, label, kwargs) {
+    //             var underscore_label = label//'series_' + this.LINE_NUM;
+
+    //     if (label == undefined) {label = underscore_label};
+    //     if (kwargs == undefined) {
+    //         kwargs = {}
+    //         kwargs['alpha']=1;
+    //         kwargs['add_legend']=true;
+    //     };
+    //     if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
+    //     if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
+
+
+    //     var color_scheme = this._LOLLIPOP;
+    //     this.LABEL_DICT[label] = underscore_label;
+
+    //     data_args = {'x':x, 'y':y, 'y_bottom':y_bottom}
+
+
+    //     this._create_data_for_d3(data_args, underscore_label, label, kwargs);
+    //     // Line
+    //     if (x[0].length > 10) {
+    //         this.DATA.forEach(function(d) {d.x = parseDatetime(d.x)});
+    //     }
+    //     else {
+    //         this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
+    //     }
+
+
+    //     x_scale = d3.time.scale().range([0, this.WIDTH]); // Line
+    //     this._scale_numerical_y_data(underscore_label)
+    //     this._scale_date_x_data(underscore_label)
+
+    //     this._add_grid_lines();
+    //     this._draw_area(underscore_label, label);
+    //     this._add_numeric_y_axis();
+    //     this._add_date_x_axis();
+
+
+
+    //     var currline_color = this.DATA_DICT[underscore_label]['color'];
+    //     if (kwargs['add_legend']) {this._add_legend(label, currline_color);}
+    //     if (kwargs['color_from'] == undefined) {this.LINE_NUM = this.LINE_NUM + 1;}
+    // }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1006,6 +1232,10 @@ function chart(style_name, gif) {
 
     this.scatter = function(x, y, label, kwargs) {
 
+        console.log('hi')
+        this._draw = this._draw_scatter
+        this.x_is_dates = this._is_dates(x);
+        this.x_is_numeric = this.isNumeric(x)
 
         var underscore_label = label//'series_' + this.LINE_NUM;
 
@@ -1014,25 +1244,51 @@ function chart(style_name, gif) {
             kwargs = {}
             kwargs['alpha']=1;
             kwargs['add_legend']=true;
-            kwargs['size'] = 10
         };
         if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
-        if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = false;}
-        if (kwargs['size'] == undefined) {kwargs['size'] = 20;}
+        if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
+
+        if (!this.x_is_numeric &&  !this.x_is_dates) { // string labels\
+            kwargs["x_tick_labels"] = x
+            x = Array.apply(null, Array(x.length)).map(function (_, i) {return i;});
+        }
 
 
         var color_scheme = this._LOLLIPOP;
         this.LABEL_DICT[label] = underscore_label;
 
-        this._create_data_for_d3(x, y, underscore_label, label, kwargs);
-        // Line
-        x_scale = d3.scale.linear().range([0, this.WIDTH]);
+        var data_args = {'x':x, 'y':y}
+
+        this._create_data_for_d3(data_args, underscore_label, label, kwargs);
+
+
+        if (this.x_is_dates) {
+
+            if (x[0].length > 10) {
+                this.DATA.forEach(function(d) {d.x = parseDatetime(d.x)});
+            } else {
+                this.DATA.forEach(function(d) {d.x = parseDate(d.x)});
+            }
+
+            x_scale = d3.time.scale().range([0, this.WIDTH]);
+            this._scale_date_x_data_for_bar(underscore_label)
+
+        }
+        else {
+            x_scale = d3.scale.linear().range([0, this.WIDTH]);
+            this._scale_numerical_x_data_for_bar(underscore_label)
+        }
+
         this._scale_numerical_y_data(underscore_label)
-        this._scale_numerical_x_data(underscore_label)
         this._add_grid_lines();
-        this._draw_scatter(label, kwargs);
+        this._draw_scatter(underscore_label, label, kwargs);
         this._add_numeric_y_axis();
-        this._add_numeric_x_axis();
+
+        if (this.x_is_dates) {
+            this._add_date_x_axis();
+        } else {
+            this._add_numeric_x_axis(kwargs["x_tick_labels"]);
+        }
 
         var currline_color = this.DATA_DICT[underscore_label]['color'];
         if (kwargs['add_legend']) {this._add_legend(label, currline_color);}

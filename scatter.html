@@ -14,9 +14,9 @@
 
     <script>
         ch = new chart("ipython");
-        ch.scatter([1,5,4], [4,3,3], '1 Month', {'url':"https://s-media-cache-ak0.pinimg.com/originals/a5/7c/7e/a57c7e202569bcc532cd4e87722624ed.gif"});
-        ch.scatter([4,2,3], [6,3,7], '2 Month', {'url':"http://imagesmtv-a.akamaihd.net/uri/mgid:file:http:shared:mtv.com/news/wp-content/uploads/2015/07/giphy-3-1435766188.gif"});
-        ch.scatter([1.4,4.2,6.3], [3.3,5.9,2.6], 'F Month', {'url':"https://media.giphy.com/media/zeccxaOfU2PWo/giphy.gif"});
+        ch.scatter([1,5,4], [4,3,3], '1 Month', {'url':"https://s-media-cache-ak0.pinimg.com/originals/a5/7c/7e/a57c7e202569bcc532cd4e87722624ed.gif", 'size':10});
+        ch.scatter([4,2,3], [6,3,7], '2 Month', {'url':"http://imagesmtv-a.akamaihd.net/uri/mgid:file:http:shared:mtv.com/news/wp-content/uploads/2015/07/giphy-3-1435766188.gif", 'size':10});
+        ch.scatter([1.4,4.2,6.3], [3.3,5.9,2.6], 'F Month', {'url':"https://media.giphy.com/media/zeccxaOfU2PWo/giphy.gif", 'size':10});
         $('#ch1').append(ch.svg.node())
     </script>
 
