@@ -626,6 +626,7 @@ this._draw_area = function(underscore_label, label, data) {
                       .attr("r", r.toString())
                       // .style("fill", function(d) { return "url(#"+data_dict[index]['url']+")"});
                       .style("fill", data_dict[index]["color"])
+                      .style("opacity", kwargs['opacity'])
                       // .attr('class','scatters')
 
             line_num = line_num + 1

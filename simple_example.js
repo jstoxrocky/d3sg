@@ -63,8 +63,8 @@ $(document).ready(function(){
 	ch.set_xlabel("(Registration Date)");
 	
 	
-	ch.scatter(x, y, 'a', {"size":5});
-	ch.scatter(x, y2, 'b', {"size":5});
+	ch.scatter(x, y, 'a', {"opacity":0.5,});
+	ch.scatter(x, y2, 'b', {"opacity":0.5,});
 	// ch.append_area(["2013-02-02", "2013-02-04"], [120, 120], [220, 220], "b", {"color":"#5DA5DA", "alpha":0.5})
 
 	// ch.set_ymin(0);
