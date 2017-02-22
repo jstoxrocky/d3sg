@@ -491,10 +491,12 @@ this._draw_area = function(underscore_label, label, data) {
         if (x1.length > 10) {
             _data.forEach(function(d) {d.x = parseDatetime(d.x)});
             x1 = parseDatetime(x1)
+            x2 = parseDatetime(x2)
         }
         else {
             _data.forEach(function(d) {d.x = parseDate(d.x)});
             x1 = parseDate(x1)
+            x2 = parseDate(x2)
         }
 
         var current_g = this.g;
@@ -507,9 +509,9 @@ this._draw_area = function(underscore_label, label, data) {
 
         var lineGraph = current_g.append("rect")
                    .attr('x', x_scale(x1))
-                   .attr('y', y_scale(this.calc_ymax))
-                   .attr('height', y_scale(this.calc_ymin - this.calc_ymax) - this.MARGIN.bottom)
-                   .attr('width', 100)
+                   .attr('y', 0)//y_scale(this.calc_ymax))
+                   .attr('height', this.style.height - this.MARGIN.bottom - this.MARGIN.top)//y_scale(this.calc_ymin - this.calc_ymax) - this.MARGIN.bottom)
+                   .attr('width', x_scale(x2) - x_scale(x1))
                    .attr("fill", kwargs['color'])
                    .attr("opacity", kwargs['alpha']);
 
@@ -522,7 +524,7 @@ this._draw_area = function(underscore_label, label, data) {
         //             .text(note);
 
     if (kwargs['add_legend']) {
-        this._add_legend(label, kwargs['color'], 10)
+        this._add_legend(label, kwargs['color'], kwargs['alpha'], 10)
     }
 
         
@@ -1581,12 +1583,15 @@ this._draw_area = function(underscore_label, label, data) {
     }
 
 
-    this._add_legend = function(label, currline_color, stroke_width) {
+    this._add_legend = function(label, currline_color, currline_alpha, stroke_width) {
 
         var line_num = this.LINE_NUM % 9;
         var currline_color = currline_color;
         if (stroke_width == undefined) {
             stroke_width = 2
+        }
+        if (currline_alpha == undefined) {
+            currline_alpha = 1.0
         }
         
         this.svg.append("text")
@@ -1605,6 +1610,7 @@ this._draw_area = function(underscore_label, label, data) {
             .attr("y2", this.LEGEND_NUM*15 + this.MARGIN.top)
             .attr("stroke-width", stroke_width)
             .attr("stroke", currline_color) // adding goes down
+            .attr("opacity", currline_alpha)
             .style("fill", "none");
         this.LEGEND_NUM = this.LEGEND_NUM+1
 

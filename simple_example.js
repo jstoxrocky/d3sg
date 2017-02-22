@@ -38,7 +38,7 @@ $(document).ready(function(){
 	// var parseDate = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
 	// console.log(parseDate('2016-05-04 22:00:53'))
 
-	var ch = new chart('dash');
+	var ch = new chart('ipython');
 	
 	// ch.area(x, y, y_bottom, 'Confidence Interval', {'alpha':0.7});
 
@@ -59,8 +59,8 @@ $(document).ready(function(){
 	ch.set_ylabel("(USD)");
 	ch.set_xlabel("(Registration Date)");
 
-	ch.highlight("2013-02-04", "2013-02-20", "In 0.1%");
 	
+	ch.highlight("2013-02-17", "2013-03-03", "In 0.1%");
 	
 	// ch.scatter(x, y, 'a', {"opacity":0.5,});
 	// ch.scatter(x, y2, 'b', {"opacity":0.5,});
