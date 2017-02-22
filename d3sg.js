@@ -5,6 +5,7 @@ Date.prototype.addDays = function(days)
     return dat;
 }
 
+
 function chart(style_name, gif) {
 
 
@@ -463,6 +464,79 @@ this._draw_area = function(underscore_label, label, data) {
 
     }
     
+
+
+
+
+
+
+    this.highlight = function(x1, x2, label, kwargs) {
+
+        if (kwargs == undefined) {
+            kwargs = {}
+            kwargs['alpha']=0.3;
+            kwargs['add_legend']=true;
+        };
+        if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 0.3;}
+        if (kwargs['color'] == undefined) {kwargs['color'] = "#31B94D";}
+        if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
+
+        if (!this.x_is_numeric &&  !this.x_is_dates) { // string labels\
+            kwargs["x_tick_labels"] = x
+            x = Array.apply(null, Array(x.length)).map(function (_, i) {return i;});
+        }
+
+        _data = [{'x':x1, 'y':this.calc_ymax}, {'x':x2, 'y':this.calc_ymin}]
+
+        if (x1.length > 10) {
+            _data.forEach(function(d) {d.x = parseDatetime(d.x)});
+            x1 = parseDatetime(x1)
+        }
+        else {
+            _data.forEach(function(d) {d.x = parseDate(d.x)});
+            x1 = parseDate(x1)
+        }
+
+        var current_g = this.g;
+
+        // var lineFunction = d3.svg.line()
+        //          .x(function(d) { return x_scale(d.x); })
+        //          .y(function(d) { return y_scale(d.y); })
+        //          .interpolate("linear");
+
+
+        var lineGraph = current_g.append("rect")
+                   .attr('x', x_scale(x1))
+                   .attr('y', y_scale(this.calc_ymax))
+                   .attr('height', y_scale(this.calc_ymin - this.calc_ymax) - this.MARGIN.bottom)
+                   .attr('width', 100)
+                   .attr("fill", kwargs['color'])
+                   .attr("opacity", kwargs['alpha']);
+
+        // var text = current_g.append('text')
+        //             .attr("x", x_scale(x))
+        //             .attr("y", y_scale(this.calc_ymax*0.99))
+        //             .attr("dy", "-0.5em")
+        //             .style("text-anchor", "end")
+        //             .attr("transform", "rotate(-90," + x_scale(x) + "," + y_scale(this.calc_ymax*0.99) + ")")
+        //             .text(note);
+
+    if (kwargs['add_legend']) {
+        this._add_legend(label, kwargs['color'], 10)
+    }
+
+        
+
+
+    }
+
+
+
+
+
+
+
+
 
 
 
@@ -1076,6 +1150,15 @@ this._draw_area = function(underscore_label, label, data) {
     }
 
 
+
+
+
+
+
+
+
+
+
     this._draw_bar = function(label, bar_width) {
 
         // this.g.selectAll("rect").remove();
@@ -1498,10 +1581,13 @@ this._draw_area = function(underscore_label, label, data) {
     }
 
 
-    this._add_legend = function(label, currline_color) {
+    this._add_legend = function(label, currline_color, stroke_width) {
 
         var line_num = this.LINE_NUM % 9;
         var currline_color = currline_color;
+        if (stroke_width == undefined) {
+            stroke_width = 2
+        }
         
         this.svg.append("text")
             .attr("y", this.LEGEND_NUM*15 + this.MARGIN.top) // adding goes down
@@ -1517,7 +1603,7 @@ this._draw_area = function(underscore_label, label, data) {
             .attr("x2", 25 + 1.5*this.MARGIN.left) // minus goes down 
             .attr("y1", this.LEGEND_NUM*15 + this.MARGIN.top) // adding goes down
             .attr("y2", this.LEGEND_NUM*15 + this.MARGIN.top)
-            .attr("stroke-width", 2)
+            .attr("stroke-width", stroke_width)
             .attr("stroke", currline_color) // adding goes down
             .style("fill", "none");
         this.LEGEND_NUM = this.LEGEND_NUM+1
