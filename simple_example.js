@@ -51,7 +51,7 @@ $(document).ready(function(){
 	
 
 	// ch.batch_draw_lines();
-	ch.line(x, y1, 'A');
+	ch.line(x, y1, 'A', {'dashed':true});
 
 	ch.set_title("Three and Six Month T-Bill Prices");
 	

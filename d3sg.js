@@ -167,9 +167,9 @@ function chart(style_name, gif) {
         }
 
         if (is_area) {
-            return {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color, }
+            return {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color, "dashed":kwargs['dashed']}
         }
-        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color, }
+        this.DATA_DICT[underscore_label] = {"label":label, "values": this.DATA, "alpha":kwargs['alpha'], "color":_color, "dashed":kwargs['dashed']}
         if (kwargs['url'] != undefined) {this.DATA_DICT[underscore_label]['url'] = kwargs['url']};
     }
 
@@ -442,11 +442,14 @@ this._draw_area = function(underscore_label, label, data) {
 
             line_dict[index] = valueline
 
+
+
             current_g.append("path")
                 .attr("d", valueline(data_dict[index]["values"]))
                 .style("stroke",data_dict[index]["color"])
                 .style("opacity", data_dict[index]["alpha"])
                 .style("stroke-width", 2)
+                .attr("stroke-dasharray","5," + data_dict[index]["dashed"])
                 .attr("id",index)
                 .attr("class","line")
                 .attr("fill", "none")
@@ -1096,9 +1099,20 @@ this._draw_area = function(underscore_label, label, data) {
             kwargs = {}
             kwargs['alpha']=1;
             kwargs['add_legend']=true;
+            kwargs['dashed']=false;
         };
         if (kwargs['alpha'] == undefined) {kwargs['alpha'] = 1;}
         if (kwargs['add_legend'] == undefined) {kwargs['add_legend'] = true;}
+        if (kwargs['dashed'] == undefined) {kwargs['dashed'] = false;}
+
+
+        if (kwargs['dashed']) {
+            kwargs['dashed'] = 5
+        } else {
+            kwargs['dashed'] = 0
+        }
+
+        console.log(kwargs)
 
         if (!this.x_is_numeric &&  !this.x_is_dates) { // string labels\
             kwargs["x_tick_labels"] = x
