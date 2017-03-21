@@ -1734,7 +1734,7 @@ this._draw_area = function(underscore_label, label, data) {
                 .attr("transform", function(d, i) {return "translate(" + x_scale(d.x) + " ," + (y_scale(d.y) - 20) +  ")"; });
 
         final_rects.append("rect")
-            .attr("width", "45px")
+            .attr("width", "50px")
             .attr("height", "20px")
             .style('fill',function (d) {return d.color})
             .style('opacity',function (d) {return 0.3});
@@ -1742,6 +1742,7 @@ this._draw_area = function(underscore_label, label, data) {
         final_rects.append("text")
                 .style("text-anchor", "start")
                 .attr("dy", "15px")
+                .attr("dx", "5px")
                 .text(function(d) {return Math.round(d.y * 100) / 100});
 
         // var rect = current_g.append('rect')
