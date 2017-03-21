@@ -1742,7 +1742,7 @@ this._draw_area = function(underscore_label, label, data) {
         final_rects.append("text")
                 .style("text-anchor", "start")
                 .attr("dy", "15px")
-                .attr("dx", "5px")
+                .attr("dx", "3px")
                 .style("font-size", "10px")
                 .text(function(d) {return Math.round(d.y * 100) / 100});
 
