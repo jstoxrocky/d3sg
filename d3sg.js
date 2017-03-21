@@ -1743,6 +1743,7 @@ this._draw_area = function(underscore_label, label, data) {
                 .style("text-anchor", "start")
                 .attr("dy", "15px")
                 .attr("dx", "5px")
+                .style("font-size", "10px")
                 .text(function(d) {return Math.round(d.y * 100) / 100});
 
         // var rect = current_g.append('rect')
