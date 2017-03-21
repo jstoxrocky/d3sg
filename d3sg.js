@@ -1731,7 +1731,7 @@ this._draw_area = function(underscore_label, label, data) {
                 .data(d3_data)
             .enter().append("g")
                 .attr("class", "_end_nodes")
-                .attr("transform", function(d, i) {return "translate(" + x_scale(d.x) + " ," + y_scale(d.y) + ")"; });
+                .attr("transform", function(d, i) {return "translate(" + x_scale(d.x) + " ," + (y_scale(d.y) - 20) +  ")"; });
 
         final_rects.append("rect")
             .attr("width", "45px")
