@@ -278,8 +278,8 @@ this._draw_area = function(underscore_label, label, data) {
         // $.each(data_dict, function( index, value ) {
 
 
-            console.log('b')
-            console.log(data["values"])
+            // console.log('b')
+            // console.log(data["values"])
 
             // Have colors loop
             line_num = line_num % 9;
@@ -674,7 +674,7 @@ this._draw_area = function(underscore_label, label, data) {
         current_g.selectAll("circle").remove();
         current_g.selectAll("defs").remove();
 
-        console.log(data_dict)
+        // console.log(data_dict)
         $.each(data_dict, function( index, value ) {
 
         var r = 6//kwargs['size'];
@@ -1112,7 +1112,7 @@ this._draw_area = function(underscore_label, label, data) {
             kwargs['dashed'] = 0
         }
 
-        console.log(kwargs)
+        // console.log(kwargs)
 
         if (!this.x_is_numeric &&  !this.x_is_dates) { // string labels\
             kwargs["x_tick_labels"] = x
@@ -1332,7 +1332,7 @@ this._draw_area = function(underscore_label, label, data) {
 
     this.scatter = function(x, y, label, kwargs) {
 
-        console.log('hi')
+        // console.log('hi')
         this._draw = this._draw_scatter
         this.x_is_dates = this._is_dates(x);
         this.x_is_numeric = this.isNumeric(x)
@@ -1697,6 +1697,83 @@ this._draw_area = function(underscore_label, label, data) {
             this._add_numeric_x_axis();
         }
     }
+
+
+    this.annotate_final_values = function() {
+
+        var current_g = this.g;
+        // var final_vals = this.DATA[this.DATA.length-1]
+        var final_vals
+        var data
+        var color
+
+        var data_dict = this.DATA_DICT
+
+        var d3_data = []
+        $.each(data_dict, function( index, value ) {
+
+            data = data_dict[index]["values"]
+            color = data_dict[index]["color"]
+            final_vals = data[data.length-1]
+            // x_s.push(final_vals.x)
+            // y_s.push(final_vals.y)
+            d3_data.push({x:final_vals.x, y:final_vals.y, color:color})
+
+
+
+        });
+
+        // d3_data = {x:x_s, y:y_s}
+
+        console.log(d3_data)
+
+        final_rects = current_g.selectAll("._end_nodes")
+                .data(d3_data)
+            .enter().append("g")
+                .attr("class", "_end_nodes")
+                .attr("transform", function(d, i) {return "translate(" + x_scale(d.x) + " ," + y_scale(d.y) + ")"; });
+
+        final_rects.append("rect")
+            .attr("width", "45px")
+            .attr("height", "20px")
+            .style('fill',function (d) {return d.color})
+            .style('opacity',function (d) {return 0.3});
+
+        final_rects.append("text")
+                .style("text-anchor", "start")
+                .attr("dy", "15px")
+                .text(function(d) {return Math.round(d.y * 100) / 100});
+
+        // var rect = current_g.append('rect')
+        //         // .attr("x", x_scale(final_vals.x))
+        //         // .attr("y", y_scale(final_vals.y))
+        //         .attr('height','10px')
+        //         .attr('width','10px')
+        //         .style('fill','#fff')
+
+        //         console.log(rect)
+
+        //     var text = rect.append('text')
+        //         .attr("x", x_scale(final_vals.x))
+        //         .attr("y", y_scale(final_vals.y))
+        //         .attr("dy", "-0.5em")
+        //         .style("text-anchor", "start")
+        //         .text(Math.round(final_vals.y * 100) / 100);
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     this._create_canvas();
     this._add_default_title();
